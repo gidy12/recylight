@@ -1,0 +1,20 @@
+# Temporary fix scripts
+fix_login.ps1
+fix_login2.ps1
+zip_admin_check.txt
+
+# Deploy artifact (binary, regenerated before each deploy)
+recy-light-deploy.zip
+
+# Local development server (optional - keep if useful)
+# serve-recylight.js
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo

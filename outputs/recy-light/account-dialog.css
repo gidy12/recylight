@@ -1,0 +1,43 @@
+.account-dialog{width:min(440px,calc(100% - 32px));max-height:min(90dvh,720px);overflow:auto;padding:28px;border:1px solid #e8e9e5;border-radius:18px;background:var(--paper);color:var(--ink);box-shadow:0 24px 80px #07101b35}
+.account-dialog::backdrop{background:rgba(8,17,24,.58);backdrop-filter:blur(3px)}
+.account-dialog form{display:grid;gap:16px}
+.account-dialog .dialog-head{align-items:flex-start;padding-bottom:18px}
+.account-dialog .dialog-head h2{font:700 25px/1.2 Manrope,Arial,sans-serif;letter-spacing:-.7px}
+.account-intro{margin:-4px 0 0;color:#707b77;font-size:12px;line-height:1.6}
+.account-tabs{display:grid;grid-template-columns:1fr 1fr;gap:5px;padding:4px;border-radius:10px;background:#f0f2eb}
+.account-tab{min-height:38px;border:0;border-radius:7px;background:transparent;color:#66716d;font-size:11px;font-weight:700}
+.account-tab.active{background:#fff;color:var(--ink);box-shadow:0 1px 4px #14213118}
+.account-fields{display:grid;gap:12px}
+.account-fields label{display:grid;gap:6px;color:#36443c;font-size:10px;font-weight:700}
+.account-fields input{width:100%;min-height:43px;padding:0 12px;border:1px solid #dfe3dc;border-radius:8px;background:#fff;color:var(--ink);font-size:12px;outline:0}
+.account-fields input:focus{border-color:#a6cc54;box-shadow:0 0 0 3px #a6cc542b}
+.account-fields input::placeholder{color:#9aa39e}
+.account-submit{width:100%;min-height:44px;justify-content:center;border-radius:8px}
+.account-profile{display:grid;gap:12px}
+.account-profile[hidden]{display:none}
+.account-profile label{display:grid;gap:6px;color:#36443c;font-size:10px;font-weight:700}
+.account-profile input{width:100%;min-height:43px;padding:0 12px;border:1px solid #dfe3dc;border-radius:8px;background:#fff;color:var(--ink);font-size:14px;outline:0}
+.account-profile input:focus{border-color:#a6cc54;box-shadow:0 0 0 3px #a6cc542b}
+.profile-email-label{margin:0;color:#66716d;font-size:10px;font-weight:700}
+.profile-email{margin:-8px 0 0;color:var(--ink);font-size:13px;overflow-wrap:anywhere}
+.profile-feedback{min-height:15px;margin:0;color:#547b31;font-size:11px;line-height:1.5}
+.profile-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.profile-actions button{min-height:42px}
+.account-logout{border:1px solid #dfe3dc;border-radius:8px;background:transparent;color:var(--ink);font-size:12px;font-weight:700}
+.account-logout:hover{background:#f5f6f3}
+.account-submit:disabled,.profile-actions button:disabled{opacity:.65;cursor:wait}
+.forgot-password{justify-self:end;margin-top:-7px;padding:4px 0;border:0;background:transparent;color:#587c2d;font-size:11px;font-weight:700}.forgot-password:hover{text-decoration:underline;text-underline-offset:3px}.account-reset-note{margin:-6px 0 0;color:#66716d;font-size:10px;line-height:1.55}.account-reset-note a{color:#456a20;font-weight:700;overflow-wrap:anywhere}.dark-mode .forgot-password,.dark-mode .account-reset-note a{color:#c3e875}.dark-mode .account-reset-note{color:#b6c0ba}
+.account-dialog .form-feedback{min-height:0;margin:0;color:#547b31;font-size:10px;line-height:1.5}
+.dark-mode .account-dialog{border-color:#35434a;background:#131e26;color:#e5ece9}
+.dark-mode .account-dialog .account-intro{color:#a9b5b0}
+.dark-mode .account-tabs{background:#202c33}
+.dark-mode .account-tab{color:#bec8c3}
+.dark-mode .account-tab.active{background:#35434a;color:#edf2ef}
+.dark-mode .account-fields label{color:#d9e1da}
+.dark-mode .account-fields input{border-color:#46535a;background:#1b2830;color:#e5ece9}
+.dark-mode .account-profile label,.dark-mode .profile-email{color:#d9e1da}
+.dark-mode .account-profile input{border-color:#46535a;background:#1b2830;color:#e5ece9}
+.dark-mode .account-logout{border-color:#46535a;color:#e5ece9}
+.dark-mode .account-logout:hover{background:#202c33}
+@media(max-width:480px){.account-dialog{padding:22px;border-radius:15px}.account-dialog .dialog-head h2{font-size:22px}}
+@media(max-width:767px){input,select,textarea{font-size:16px!important}}

@@ -1,0 +1,33 @@
+@media(max-width:620px){
+  .product-grid{grid-template-columns:minmax(0,1fr);gap:16px}
+  .product-card{padding:12px 12px 15px}
+  .product-card .product-image{aspect-ratio:1/1;border-radius:16px}
+  .product-card .product-details{padding-top:15px}
+  .product-card .product-title{font-size:19px;min-height:0;margin:7px 0 12px}
+  .product-card .product-price{font-size:24px;margin-bottom:12px}
+  .product-stock{font-size:13px;margin-bottom:13px}
+  .product-actions{grid-template-columns:54px 1fr;gap:10px}
+  .cart-icon-add,.buy-now{height:50px;border-radius:15px}
+  .hero-banner .hero-arrow{top:14px;bottom:auto;transform:none;width:38px;height:38px}
+  .hero-banner .hero-arrow-prev{left:12px}
+  .hero-banner .hero-arrow-next{right:12px}
+  .hero-banner-copy{padding-top:72px}
+  .hero-banner h1{overflow-wrap:anywhere}
+  .site-header,main,.shop-section,.site-footer{max-width:100%;min-width:0}
+  body{overflow-x:clip}
+}
+@media(max-width:360px){
+  .product-card .product-price{font-size:21px}
+  .product-card .product-title{font-size:17px}
+  .hero-banner .hero-arrow{width:34px;height:34px}
+  .hero-banner .hero-arrow-prev{left:8px}
+  .hero-banner .hero-arrow-next{right:8px}
+  .hero-banner-copy{padding-inline:30px}
+  .hero-banner h1{font-size:clamp(28px,9vw,34px);letter-spacing:-.04em}
+}
+@media(max-width:320px){
+  .hero-banner{width:calc(100% - 16px);min-height:440px;border-radius:18px}
+  .hero-banner-copy{padding-inline:24px}
+  .hero-banner .hero-pill{min-width:0;padding-inline:14px}
+  .header-tools .create-account{padding-inline:8px}
+}

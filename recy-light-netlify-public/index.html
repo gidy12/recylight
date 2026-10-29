@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#142131">
+  <meta name="description" content="Explore electrical supplies, lighting and practical energy solutions from RecyLight Ltd.">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="RecyLight">
+  <title>RecyLight Ltd — Turning plastic into light</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="assets/icon-180.png">
+  <link rel="preconnect" href="https://images.unsplash.com">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="hero.css">
+  <link rel="stylesheet" href="hero-fill.css">
+  <link rel="stylesheet" href="hero-banner.css">
+  <link rel="stylesheet" href="product-cards.css">
+  <link rel="stylesheet" href="product-detail.css">
+  <link rel="stylesheet" href="navbar.css">
+  <link rel="stylesheet" href="dark-mode.css">
+  <link rel="stylesheet" href="button-colors.css?v=2">
+  <link rel="stylesheet" href="language.css">
+  <link rel="stylesheet" href="responsive.css">
+  <link rel="stylesheet" href="phone-fit.css">
+  <link rel="stylesheet" href="nav-actions.css">
+  <link rel="stylesheet" href="account-dialog.css">
+  <link rel="stylesheet" href="customer-chat.css">
+  <link rel="stylesheet" href="pwa.css">
+
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-top">
+      <a class="brand" href="#home" aria-label="RecyLight Ltd home"><span>Recy<span class="brand-light">Light</span><small>Turning plastic into light</small></span></a>
+      <form class="nav-search" id="nav-search-form" role="search"><label class="visually-hidden" for="nav-search-input">Search products</label><input id="nav-search-input" type="search" placeholder="Search products"><button type="submit"><span aria-hidden="true">⌕</span> Search</button></form>
+      <div class="header-tools"><div class="delivery-label"><small>Deliver to:</small><strong><span class="rwanda-flag" aria-hidden="true">🇷🇼</span> RW</strong></div><div class="language-picker"><button class="tool-button language-button" id="language-toggle" type="button" aria-label="Choose language" aria-expanded="false" aria-haspopup="true">◎ <span id="language-current">EN</span></button><div class="language-menu" id="language-menu" role="menu" aria-label="Choose language" hidden><button class="language-option" type="button" role="menuitemradio" data-language="en">English</button><button class="language-option" type="button" role="menuitemradio" data-language="rw">Kinyarwanda</button><button class="language-option" type="button" role="menuitemradio" data-language="sw">Swahili</button></div></div><button class="tool-button theme-toggle" id="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false"><span aria-hidden="true">☾</span></button><button class="cart-button" id="cart-open" type="button" aria-label="Open cart"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2l2.2 11.1a2 2 0 0 0 2 1.6h8.9a2 2 0 0 0 1.9-1.4L22 8H6M10 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2Zm8 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z"/></svg><span class="cart-count" id="cart-count" aria-label="Items in cart">0</span></button><button class="tool-button account-button" type="button" aria-label="Log in or create an account"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c.6-4.3 3.5-6.5 8-6.5s7.4 2.2 8 6.5"/></svg></button><button class="create-account" id="create-account-trigger" type="button">Create account</button>
+      </div>
+    </div>
+  </header>
+  <main>
+        <section class="hero hero-banner" id="home">
+      <div class="hero-photo-stage" id="hero-carousel" role="region" aria-roledescription="carousel" aria-label="Lighting inspiration photos">
+        <img class="hero-photo active" src="assets/hero-bulbs.jpg" alt="Warm glowing decorative light bulbs" fetchpriority="high">
+        <img class="hero-photo" src="assets/hero-light-helper.jpg" alt="A playful light bulb character plugging in a lamp" aria-hidden="true">
+        <img class="hero-photo" src="assets/hero-light-hands.jpg" alt="Hands reaching toward a softly glowing light bulb" aria-hidden="true">
+        <div class="photo-shade"></div>
+      </div>
+      <div class="hero-copy hero-banner-copy"><span class="eyebrow"><i></i> RECYLIGHT LTD</span><h1>Powering brighter choices</h1><p>Electrical essentials for homes, businesses, and every project in between.</p><div class="hero-actions"><a class="button button-green hero-pill" href="#shop">Shop products <span>→</span></a><a class="button hero-pill hero-pill-secondary" href="#filters">Explore categories <span aria-hidden="true">▦</span></a></div></div>
+    </section>
+    <section class="section shop-section" id="shop"><div class="section-heading"><div><span class="eyebrow">A FEW CUSTOMER FAVOURITES</span><h2>Good things, <em>well chosen.</em></h2></div><div class="shop-controls"><label class="search-box"><span>⌕</span><input id="search" type="search" placeholder="Find something…" aria-label="Search products"></label><select id="sort" aria-label="Sort products"><option value="featured">Sort: Featured</option><option value="low">Price: Low to high</option><option value="high">Price: High to low</option><option value="name">Name: A to Z</option></select></div></div><div class="filter-row" id="filters"><button class="filter-chip active" data-filter="All">All products</button><button class="filter-chip" data-filter="Lighting">Lighting</button><button class="filter-chip" data-filter="Electrical">Electrical</button><button class="filter-chip" data-filter="Accessories">Accessories</button><button class="filter-chip" data-filter="Tools">Tools</button><span id="result-count" class="result-count"></span></div><div class="product-grid" id="product-grid" aria-live="polite"></div><div class="empty-state" id="empty-state" hidden><span>⌕</span><h3>No matches just yet</h3><p>Try another search or browse all products.</p><button class="button button-outline" id="clear-filters">Clear filters</button></div></section>
+  </main>
+  <footer class="site-footer" id="about"><div class="footer-main"><a class="brand brand-footer" href="#home"><span>Recy<span class="brand-light">Light</span><small>Turning plastic into light</small></span></a><p>Everyday electricals.<br>A brighter way forward.</p><div class="footer-links"><div><b>EXPLORE</b><a href="#shop" data-nav-category="All">All categories</a><a href="#about">About RecyLight</a><a href="#shop">Shop products</a></div><div><b>NEED HELP?</b><span id="footer-contact-details"></span><button class="footer-help-link" type="button" data-nav-action="help">Help center <span aria-hidden="true">→</span></button></div></div></div><div class="footer-bottom"><span>© <span id="year"></span> RecyLight Ltd</span><span>Thoughtful choices. Brighter days. <i>✳</i></span></div></footer>
+  <div class="overlay" id="overlay" hidden></div>
+  <aside class="cart-drawer" id="cart-drawer" aria-label="Shopping cart" aria-modal="true" role="dialog" hidden><div class="drawer-head"><div><span class="eyebrow">YOUR GOOD FINDS</span><h2>Your cart <span id="drawer-count">(0)</span></h2></div><button class="close-button" id="cart-close" aria-label="Close cart">×</button></div><div class="cart-items" id="cart-items"></div><div class="cart-empty" id="cart-empty"><span>◌</span><h3>Your cart is taking a breather.</h3><p>Add a few essentials and they’ll show up here.</p><button class="button button-outline" id="continue-shopping">Explore products</button></div><div class="cart-summary" id="cart-summary" hidden><div><span>Subtotal</span><b id="cart-total">RWF 0</b></div><small>Delivery and final prices are confirmed during order processing.</small><button class="button button-green checkout-open">Continue to checkout <span>→</span></button><button class="whatsapp-cart" id="whatsapp-cart" disabled title="Business WhatsApp number has not been configured">WhatsApp order <span>↗</span></button><p class="config-hint">WhatsApp ordering will be available when the business number is configured.</p></div></aside>
+  <dialog class="product-detail-dialog" id="product-detail-dialog" aria-labelledby="detail-name"><button class="close-button product-detail-close" id="detail-close" type="button" aria-label="Close product details">×</button><div class="product-detail-layout"><img id="detail-image" alt=""><div class="product-detail-copy"><span class="product-category" id="detail-category"></span><h2 id="detail-name"></h2><strong class="product-detail-price" id="detail-price"></strong><p id="detail-description"></p><div class="product-stock" id="detail-stock"></div><div class="product-detail-actions"><button class="cart-icon-add" id="detail-add" type="button">Add to cart</button><button class="buy-now" id="detail-buy" type="button">Buy</button></div></div></div></dialog>
+  <dialog class="nav-dialog" id="nav-dialog" aria-labelledby="nav-dialog-title"><div class="nav-dialog-head"><div><span class="eyebrow">RECYLIGHT</span><h2 id="nav-dialog-title">Information</h2></div><button class="close-button" id="nav-dialog-close" type="button" aria-label="Close">×</button></div><div class="nav-dialog-content" id="nav-dialog-content"></div><form class="business-inquiry-form" id="business-inquiry-form" hidden><input type="hidden" id="inquiry-type"><label>Your name<input id="inquiry-name" required autocomplete="name" placeholder="Your name"></label><label>Email address<input id="inquiry-email" required type="email" autocomplete="email" placeholder="you@example.com"></label><label>Phone <span>(optional)</span><input id="inquiry-phone" type="tel" autocomplete="tel" placeholder="+250 7xx xxx xxx"></label><label>How can we help?<textarea id="inquiry-message" rows="4" required placeholder="Write your enquiry"></textarea></label><button class="button button-green inquiry-submit" type="submit">Send enquiry <span>→</span></button><p class="inquiry-feedback" id="inquiry-feedback" role="status"></p></form></dialog>
+  <dialog class="account-dialog" id="account-dialog" aria-labelledby="account-title"><form id="account-form"><div class="dialog-head"><div><span class="eyebrow">YOUR RECYLIGHT ACCOUNT</span><h2 id="account-title">Create account</h2></div><button class="close-button" type="button" id="account-close" aria-label="Close account dialog">×</button></div><p class="account-intro" id="account-intro">Create an account or log in to continue to your order enquiry.</p><div class="account-tabs" id="account-tabs" role="tablist" aria-label="Account access"><button class="account-tab active" id="register-tab" type="button" role="tab" aria-selected="true">Create account</button><button class="account-tab" id="login-tab" type="button" role="tab" aria-selected="false">Log in</button></div><div class="account-fields"><label id="account-name-field">Full name<input id="account-name" name="name" autocomplete="name" required placeholder="Your name"></label><label>Email address<input id="account-email" name="email" type="email" autocomplete="email" required placeholder="you@example.com"></label><label>Password<input id="account-password" name="password" type="password" autocomplete="new-password" minlength="8" required placeholder="At least 8 characters"></label></div><button class="forgot-password" id="account-forgot-password" type="button" hidden>Forgot password?</button><p class="account-reset-note" id="account-reset-note" role="status" hidden></p><button class="button button-green account-submit" id="account-submit" type="submit">Create account <span>→</span></button><section class="account-profile" id="account-profile" hidden><label>Full name<input id="profile-name" autocomplete="name" maxlength="80"></label><p class="profile-email-label">Email address</p><p class="profile-email" id="profile-email"></p><p class="profile-feedback" id="profile-feedback" role="status"></p><div class="profile-actions"><button class="button button-green" id="profile-save" type="button">Save profile</button><button class="account-logout" id="profile-logout" type="button">Log out</button></div></section><p class="form-feedback" id="account-feedback" role="status"></p></form></dialog>
+  <dialog class="checkout-dialog" id="checkout-dialog"><form id="checkout-form"><div class="dialog-head"><div><span class="eyebrow">ALMOST THERE</span><h2>Order enquiry</h2></div><button class="close-button" type="button" id="checkout-close" aria-label="Close checkout">×</button></div><p class="checkout-disclaimer">This preview does not submit or create a real order. Connect the checkout API before accepting customer orders.</p><div class="checkout-fields"><label>Full name<input required name="name" autocomplete="name" placeholder="Your name"></label><label>Phone number<input required name="phone" type="tel" autocomplete="tel" placeholder="e.g. 078…"></label><label>Email <span>(optional)</span><input name="email" type="email" autocomplete="email" placeholder="you@example.com"></label><label>Delivery address<textarea required name="address" autocomplete="street-address" rows="2" placeholder="Street, area, district"></textarea></label><label>Payment method<select name="payment"><option value="">Choose a method</option><option>Mobile Money (setup required)</option><option>Pay on delivery (setup required)</option></select></label><label>Delivery instructions <span>(optional)</span><textarea name="instructions" rows="2" placeholder="Anything we should know?"></textarea></label></div><div class="checkout-total"><span>Estimated subtotal</span><b id="checkout-total">RWF 0</b></div><button class="button button-green submit-inquiry" type="submit">Review enquiry <span>→</span></button><p class="form-feedback" id="form-feedback" role="status"></p></form></dialog>
+  <section class="customer-chat" id="customer-chat" aria-label="Customer chat" hidden>
+    <header class="customer-chat-head"><div class="chat-brand"><div class="chat-brand-copy"><strong data-chat-t="RecyLight assistant">RecyLight assistant</strong></div></div><button type="button" class="chat-close" id="chat-close" aria-label="Close chat">×</button></header>
+    <div class="customer-chat-log" id="chat-log" aria-live="polite" aria-relevant="additions"></div>
+    <div class="customer-chat-options" id="chat-options"></div>
+    <form class="customer-chat-form" id="chat-form"><label class="visually-hidden" for="chat-input" data-chat-t="Type your message">Type your message</label><input id="chat-input" autocomplete="off" placeholder="Tell us what you need…" data-chat-placeholder="Tell us what you need…"><button type="submit" aria-label="Send message">↑</button></form>
+    <small class="chat-preview-note" data-chat-t="Preview chat: requests are saved in this browser for the admin report.">Preview chat: requests are saved in this browser for the admin report.</small>
+  </section>
+  <button class="customer-chat-launch" id="chat-launch" type="button" aria-controls="customer-chat" aria-expanded="false"><span aria-hidden="true">☏</span><span data-chat-t="Chat with us">Chat with us</span></button>
+  <button class="pwa-install-button" id="pwa-install-button" type="button" hidden><span class="pwa-install-icon" aria-hidden="true">↓</span><span>Install app</span></button>
+  <button class="pwa-update-button" id="pwa-update-button" type="button" hidden>Update RecyLight</button>
+  <dialog class="ios-install-dialog" id="ios-install-dialog" aria-labelledby="ios-install-title"><h2 id="ios-install-title">Install RecyLight</h2><p>Tap the Share button <span class="ios-share-symbol" aria-label="Share">↑</span> in Safari, then choose <strong>Add to Home Screen</strong>.</p><button type="button" id="ios-install-close">Got it</button></dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="products-data.js"></script>
+  <script src="app.js"></script><script type="module" src="account-auth.js"></script>
+  <script src="hero-carousel.js"></script>
+  <script src="navbar.js"></script>
+  <script src="theme.js"></script>
+  <script src="language.js"></script>
+  <script src="customer-chat.js"></script>
+  <script src="pwa.js"></script>
+</body>
+</html>

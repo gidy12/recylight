@@ -1,5 +1,5 @@
 const CACHE_PREFIX = 'recylight-shell-';
-const CACHE_NAME = `${CACHE_PREFIX}5`;
+const CACHE_NAME = `${CACHE_PREFIX}6`;
 const SHELL = [
   './', './index.html', './offline.html', './manifest.webmanifest',
   './styles.css', './hero.css', './hero-fill.css', './hero-banner.css',
@@ -41,6 +41,8 @@ function isSafeStatic(request, url) {
 
 self.addEventListener('fetch', event => {
   const request = event.request;
+  // Never substitute cached storefront HTML for a form submission.
+  if (request.method !== 'GET') return;
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
 

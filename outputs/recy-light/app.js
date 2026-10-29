@@ -44,9 +44,53 @@ function sendWhatsAppOrder(){const number=whatsappNumber();if(!number){configure
 function openCheckout(){renderCart();$('#form-feedback').textContent='';$('#checkout-dialog').showModal()}
 function openCart(){renderCart();$('#overlay').hidden=false;$('#cart-drawer').hidden=false;document.body.style.overflow='hidden';$('#cart-close').focus()}
 function closeCart(){ $('#overlay').hidden=true;$('#cart-drawer').hidden=true;document.body.style.overflow='';$('#cart-open')?.focus(); }
-$('#filters').addEventListener('click',e=>{const b=e.target.closest('[data-filter]');if(!b)return;selectedCategory=b.dataset.filter;document.querySelectorAll('.filter-chip').forEach(x=>x.classList.toggle('active',x===b));renderProducts()});document.querySelectorAll('.category-card').forEach(b=>b.onclick=()=>{selectedCategory=b.dataset.category;document.querySelectorAll('.filter-chip').forEach(x=>x.classList.toggle('active',x.dataset.filter===selectedCategory));renderProducts();$('#shop').scrollIntoView({behavior:'smooth'})});$('#search').addEventListener('input',e=>{query=e.target.value;renderProducts()});$('#sort').onchange=e=>{sort=e.target.value;renderProducts()};$('#clear-filters').onclick=()=>{selectedCategory='All';query='';$('#search').value='';document.querySelectorAll('.filter-chip').forEach(x=>x.classList.toggle('active',x.dataset.filter==='All'));renderProducts()};$('#cart-open').onclick=openCart;$('#create-account-trigger')?.addEventListener('click',()=>currentUser?logoutUser():openAccount('login'));document.querySelector('.account-button')?.addEventListener('click',()=>currentUser?showAccountProfile():openAccount('login'));$('#register-tab').onclick=()=>openAccount('register');$('#login-tab').onclick=()=>openAccount('login');$('#account-close').onclick=()=>$('#account-dialog').close();$('#account-dialog').addEventListener('click',e=>{if(e.target===$('#account-dialog'))$('#account-dialog').close()});$('#account-form').addEventListener('submit',handleAccountSubmit);$('#profile-save').addEventListener('click',saveAccountProfile);$('#profile-logout').addEventListener('click',logoutUser);$('#cart-close').onclick=closeCart;$('#overlay').onclick=closeCart;$('#continue-shopping').onclick=closeCart;document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#cart-drawer').hidden)closeCart()});$('.checkout-open').onclick=()=>{closeCart();requestOrder()};$('#checkout-close').onclick=()=>$('#checkout-dialog').close();$('#checkout-dialog').addEventListener('click',e=>{if(e.target===$('#checkout-dialog'))$('#checkout-dialog').close()});$('#checkout-form').addEventListener('submit',e=>{e.preventDefault();if(!e.currentTarget.reportValidity())return;$('#form-feedback').textContent='Your details are valid for preview, but no order was sent or created. Connect the backend checkout endpoint to accept real orders.'});$('#year').textContent=new Date().getFullYear();renderProducts();renderCart();renderAccountControl();
+$('#filters').addEventListener('click',e=>{const b=e.target.closest('[data-filter]');if(!b)return;selectedCategory=b.dataset.filter;document.querySelectorAll('.filter-chip').forEach(x=>x.classList.toggle('active',x===b));renderProducts()});document.querySelectorAll('.category-card').forEach(b=>b.onclick=()=>{selectedCategory=b.dataset.category;document.querySelectorAll('.filter-chip').forEach(x=>x.classList.toggle('active',x.dataset.filter===selectedCategory));renderProducts();$('#shop').scrollIntoView({behavior:'smooth'})});$('#search').addEventListener('input',e=>{query=e.target.value;renderProducts()});$('#sort').onchange=e=>{sort=e.target.value;renderProducts()};$('#clear-filters').onclick=()=>{selectedCategory='All';query='';$('#search').value='';document.querySelectorAll('.filter-chip').forEach(x=>x.classList.toggle('active',x.dataset.filter==='All'));renderProducts()};$('#cart-open').onclick=openCart;$('#create-account-trigger')?.addEventListener('click',()=>currentUser?logoutUser():openAccount('login'));document.querySelector('.account-button')?.addEventListener('click',()=>currentUser?showAccountProfile():openAccount('login'));$('#register-tab').onclick=()=>openAccount('register');$('#login-tab').onclick=()=>openAccount('login');$('#account-close').onclick=()=>$('#account-dialog').close();$('#account-dialog').addEventListener('click',e=>{if(e.target===$('#account-dialog'))$('#account-dialog').close()});$('#account-form').addEventListener('submit',handleAccountSubmit);$('#profile-save').addEventListener('click',saveAccountProfile);$('#profile-logout').addEventListener('click',logoutUser);$('#cart-close').onclick=closeCart;$('#overlay').onclick=closeCart;$('#continue-shopping').onclick=closeCart;document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#cart-drawer').hidden)closeCart()});$('.checkout-open').onclick=()=>{closeCart();requestOrder()};$('#checkout-close').onclick=()=>$('#checkout-dialog').close();$('#checkout-dialog').addEventListener('click',e=>{if(e.target===$('#checkout-dialog'))$('#checkout-dialog').close()});$('#checkout-form').addEventListener('submit',handleOrderEnquiry);$('#year').textContent=new Date().getFullYear();renderProducts();renderCart();renderAccountControl();
 $('#whatsapp-cart').addEventListener('click',requestWhatsAppOrder);configureWhatsAppOrder();window.addEventListener('storage',event=>{if(event.key==='recylight-store-settings')configureWhatsAppOrder()});window.addEventListener('recy:auth-change',event=>{currentUser=event.detail||null;renderAccountControl();if(currentUser)syncAccountToCheckout(currentUser)});window.addEventListener('recy:auth-error',event=>accountMessage(event.detail?.message||'Authentication could not be initialized. Please refresh and try again.'));window.addEventListener('recy:auth-recovery',()=>{openAccount('reset');$('#account-intro').textContent='Choose a new password for your account.'});window.addEventListener('recy:auth-invite',event=>{inviteToken=event.detail?.token||'';if(event.detail?.email)$('#account-email').value=event.detail.email;openAccount('invite')});$('#account-forgot-password').addEventListener('click',async()=>{const note=$('#account-reset-note'),email=$('#account-email').value.trim();if(!email){note.textContent='Enter your email address above, then choose Forgot password.';note.hidden=false;$('#account-email').focus();return}try{await window.RecyLightAuth.requestPasswordRecovery(email);note.textContent='If an account exists for that email, a password reset link will be sent.';note.hidden=false}catch(error){note.textContent=error?.message||'Could not send a reset link. Please try again.';note.hidden=false}});window.RecyLightAuth?.getUser().then(user=>{currentUser=user||null;renderAccountControl();if(currentUser)syncAccountToCheckout(currentUser)}).catch(error=>window.dispatchEvent(new CustomEvent('recy:auth-error',{detail:{message:error?.message}})));
 $('#account-dialog').addEventListener('close',()=>{pendingOrder=false;pendingWhatsAppOrder=false});
 $('#account-forgot-password').addEventListener('click',()=>{const note=$('#account-reset-note');let settings={};try{settings=JSON.parse(localStorage.getItem('recylight-store-settings')||'{}')}catch{};note.replaceChildren();if(settings.email){note.append(document.createTextNode(window.translateStoreText("Password recovery isn't set up in this preview. Email RecyLight support at ")));const link=document.createElement('a');link.href=`mailto:${settings.email}?subject=${encodeURIComponent('Customer password recovery')}`;link.textContent=settings.email;note.append(link,document.createTextNode('.'))}else note.textContent=window.translateStoreText('Password recovery is not connected yet. Please contact RecyLight support.');note.hidden=false});
-$('#checkout-form')?.addEventListener('submit',async(e)=>{e.preventDefault();const form=e.currentTarget;const feedback=$('#form-feedback');const btn=form.querySelector('button[type="submit"]');feedback.textContent='';btn.disabled=true;try{const fd=new FormData(form);const orderData={name:fd.get('name'),phone:fd.get('phone'),email:fd.get('email')||undefined,address:fd.get('address'),payment_method:fd.get('payment')||'Pay on delivery',instructions:fd.get('instructions')||undefined,items:cartLines().map(({p,qty})=>({product_id:p.id,product_name:p.name,quantity:qty,unit_price:p.price})),subtotal:cartTotal()};const order=await window.RecyLightAPI.createOrder(orderData);feedback.textContent='Order submitted — a team member will confirm availability, prices, and delivery.';feedback.style.color='#1a7a1a';Object.keys(cart).forEach(k=>delete cart[k]);updateCart();setTimeout(()=>$('#checkout-dialog').close(),1500)}catch(error){feedback.textContent=error.message||'Could not submit order. Please try again.';feedback.style.color='#c00'}finally{btn.disabled=false}});
+
 initAPI().catch(()=>{/* API not reachable — local fixture and cart continue to work offline. */});
+
+async function handleOrderEnquiry(event) {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const feedback = $('#form-feedback');
+  const button = form.querySelector('button[type="submit"]');
+  if (button.disabled || !form.reportValidity()) return;
+  const lines = cartLines();
+  feedback.style.color = '';
+  if (!lines.length) {
+    feedback.textContent = 'Add an item to your cart before sending an enquiry.';
+    return;
+  }
+  button.disabled = true;
+  feedback.textContent = 'Sending your enquiry…';
+  try {
+    const data = new FormData(form);
+    data.set('form-name', 'order-enquiry');
+    data.set('items', JSON.stringify(lines.map(({p, qty}) => ({
+      product_id: p.id, product_name: p.name, quantity: qty, estimated_unit_price: p.price
+    }))));
+    data.set('subtotal', String(cartTotal()));
+    const response = await fetch('/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams(data).toString()
+    });
+    if (!response.ok) throw new Error('submission-failed');
+    // Remove only the quantities submitted; retain items added while sending.
+    for (const {p, qty} of lines) {
+      if (cart[p.id] > qty) cart[p.id] -= qty;
+      else delete cart[p.id];
+    }
+    updateCart();
+    form.reset();
+    feedback.textContent = 'Enquiry sent. RecyLight will confirm availability, final prices, payment arrangements, and delivery. No payment has been taken.';
+    feedback.style.color = '#1a7a1a';
+  } catch {
+    feedback.textContent = 'Could not send your enquiry. Check your connection and try again. Your cart and details have been kept.';
+    feedback.style.color = '#c00';
+  } finally {
+    button.disabled = false;
+  }
+}

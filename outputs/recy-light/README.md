@@ -14,7 +14,7 @@ py -m http.server 8000
 
 Then open <http://localhost:8000/>. There is no production build command. Deploy the folder contents to a static host configured for HTTPS.
 
-For Git-connected Netlify deployments, the repository-root `netlify.toml` sets an empty build command and publishes `outputs/recy-light`. It also points Netlify to the existing admin Edge Function and preserves its route mappings. These file-based settings override the dashboard build command; the publish folder must not be entered as a shell command. No Python dependency installation is required.
+For Git-connected Netlify deployments, the repository-root `netlify.toml` sets an empty build command and publishes `outputs/recy-light`. It also points Netlify to the existing admin Edge Function, which declares its protected routes in code. These file-based settings override the dashboard build command; the publish folder must not be entered as a shell command. No Python dependency installation is required.
 
 ## PWA files and behavior
 
@@ -52,7 +52,7 @@ For Git-connected Netlify deployments, the repository-root `netlify.toml` sets a
 
 ## Netlify admin route protection
 
-The Netlify Edge Function protects both `/admin.html` and `/login.html` with HTTP Basic Authentication before their browser-side preview gate runs. Before staff access, set the Netlify environment variable `RECYLIGHT_ADMIN_PASSWORD` to a long, unique secret in the site's environment variable settings, then redeploy. The username is `recy-admin`. If the variable is missing, the function returns 404 (fail closed). Do not use the browser-only admin login as production authentication; catalog edits remain local to that browser and there is no shared catalog or real order/report backend.
+The Netlify Edge Function protects both `/admin.html` and `/login.html` with HTTP Basic Authentication before their browser-side preview gate runs. Before staff access, set the Netlify environment variable `RECYLIGHT_ADMIN_PASSWORD` to a long, unique secret in the site's environment variable settings, then redeploy. The username is `recy-admin`. If the variable is missing, the function returns 503 with setup guidance and keeps the admin content inaccessible. Configure the variable for each deployment context where staff need access, then redeploy. The short URLs `/admin` and `/login` redirect to their protected HTML pages. Do not use the browser-only admin login as production authentication; catalog edits remain local to that browser and there is no shared catalog or real order/report backend.
 
 Deploy the contents of this folder through Netlify Drop or a connected Git deployment. Netlify Drop supports static deploys; confirm the dashboard's deployed functions list includes `admin-auth` after upload. If the Drop workflow does not publish Edge Functions for this site, use a Git-connected Netlify deployment so `netlify.toml` and `netlify/edge-functions/admin-auth.ts` are built and deployed.
 

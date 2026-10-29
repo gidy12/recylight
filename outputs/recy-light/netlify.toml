@@ -1,7 +1,1 @@
-[[edge_functions]]
-function = "admin-auth"
-path = "/admin.html"
-
-[[edge_functions]]
-function = "admin-auth"
-path = "/login.html"
+# Admin routes are declared in netlify/edge-functions/admin-auth.ts.

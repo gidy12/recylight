@@ -4,15 +4,6 @@
   publish = "outputs/recy-light"
   edge_functions = "outputs/recy-light/netlify/edge-functions"
 
-# Preserve the admin route protection from the storefront configuration.
-[[edge_functions]]
-  function = "admin-auth"
-  path = "/admin.html"
-
-[[edge_functions]]
-  function = "admin-auth"
-  path = "/login.html"
-
 [[headers]]
   for = "/service-worker.js"
   [headers.values]

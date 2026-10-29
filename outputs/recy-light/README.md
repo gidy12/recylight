@@ -63,3 +63,7 @@ Customer login, signup, recovery, invitations, profile updates, and logout use N
 ## Order enquiries
 
 The checkout form sends a same-origin, URL-encoded submission to Netlify Forms as `order-enquiry`, including contact and delivery details, cart items, and estimated subtotal. Submitted prices and payment preferences are customer enquiry information, not validated prices or payment confirmation. Staff can review enquiries in the Netlify Forms dashboard after deployment. Email notifications can be configured there. Failed submissions preserve the cart and form fields; successful submissions remove the submitted quantities from the cart. Form detection activation is included with deployment. The external catalog/order API is not used to submit these enquiries.
+
+### Resolve missing admin password configuration
+
+If the admin route says access is not configured, open the project in Netlify, go to **Project configuration → Environment variables**, and add `RECYLIGHT_ADMIN_PASSWORD` with a strong, unique password. Ensure it is available to **Functions** at runtime and applies to **Production** and any Deploy Preview or branch context where admin access is needed. Save it and publish a new deployment for that context. Open `/admin` again; the server should challenge for Basic Authentication instead of showing the configuration error. This server password is separate from the browser-only admin account form. Never put the password in source code or chat.

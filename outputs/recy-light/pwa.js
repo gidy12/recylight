@@ -36,7 +36,7 @@
   window.addEventListener('appinstalled', () => { hideInstall(); installPrompt = null; });
 
   if (!('serviceWorker' in navigator) || !/^https?:$/.test(location.protocol)) return;
-  navigator.serviceWorker.register('./service-worker.js', { scope: './' }).then(registration => {
+  navigator.serviceWorker.register('./service-worker.js', { scope: './', updateViaCache: 'none' }).then(registration => {
     const showUpdate = () => { updateButton.hidden = false; };
     if (registration.waiting && navigator.serviceWorker.controller) showUpdate();
     registration.addEventListener('updatefound', () => {

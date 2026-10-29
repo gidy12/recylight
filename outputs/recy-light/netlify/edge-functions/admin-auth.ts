@@ -1,9 +1,25 @@
 export default async function adminAuth(request: Request, context: { next: () => Promise<Response> }) {
   const expectedPassword = Netlify.env.get("RECYLIGHT_ADMIN_PASSWORD");
 
-  // Fail closed if the deployment has not been configured yet.
+  // Keep access closed while explaining the deployment setup problem.
   if (!expectedPassword) {
-    return new Response("Not found", { status: 404 });
+    return new Response("Admin access is not configured. The site owner must configure the admin access password in Netlify runtime settings and redeploy. Return to the storefront to continue shopping.", {
+      status: 503,
+      headers: {
+        "Content-Type": "text/plain; charset=utf-8",
+        "Cache-Control": "no-store",
+      },
+    });
+  }
+
+  const url = new URL(request.url);
+  const page = url.pathname.replace(/\/$/, "");
+  if (page === "/admin" || page === "/login") {
+    url.pathname = `${page}.html`;
+    return new Response(null, {
+      status: 302,
+      headers: { Location: url.toString(), "Cache-Control": "no-store" },
+    });
   }
 
   const authorization = request.headers.get("authorization") ?? "";
@@ -29,5 +45,11 @@ export default async function adminAuth(request: Request, context: { next: () =>
     });
   }
 
-  return context.next();
+  const response = await context.next();
+  response.headers.set("Cache-Control", "no-store");
+  return response;
 }
+
+export const config = {
+  path: ["/admin", "/admin/", "/admin.html", "/login", "/login/", "/login.html"],
+};

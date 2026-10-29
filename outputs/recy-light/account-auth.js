@@ -1,5 +1,16 @@
 const emit = (name, detail) => window.dispatchEvent(new CustomEvent(name, { detail }));
 
+// Keep network failures actionable without exposing service internals.
+window.RecyLightAuthMessage = error => {
+  if (error?.name === 'MissingIdentityError' || error?.status === 404) {
+    return 'Account sign-in is temporarily unavailable. Please try again later.';
+  }
+  if (error instanceof TypeError || /failed to fetch|networkerror|network request failed|load failed/i.test(error?.message || '')) {
+    return 'Could not connect to account sign-in. Check your internet connection and try again.';
+  }
+  return error?.message || 'Could not complete sign-in. Please try again.';
+};
+
 try {
   const {
     acceptInvite,
@@ -26,6 +37,6 @@ try {
     });
   }
 } catch (error) {
-  window.RecyLightAuthError = error?.message || 'Authentication could not be initialized.';
-  emit('recy:auth-error', { message: error?.message || 'Authentication could not be initialized.' });
+  window.RecyLightAuthError = window.RecyLightAuthMessage(error);
+  emit('recy:auth-error', { message: window.RecyLightAuthMessage(error) });
 }

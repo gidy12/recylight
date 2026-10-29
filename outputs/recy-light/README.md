@@ -14,6 +14,8 @@ py -m http.server 8000
 
 Then open <http://localhost:8000/>. There is no production build command. Deploy the folder contents to a static host configured for HTTPS.
 
+For Git-connected Netlify deployments, the repository-root `netlify.toml` sets an empty build command and publishes `outputs/recy-light`. It also points Netlify to the existing admin Edge Function and preserves its route mappings. These file-based settings override the dashboard build command; the publish folder must not be entered as a shell command. No Python dependency installation is required.
+
 ## PWA files and behavior
 
 - `manifest.webmanifest` declares the standalone app, launch URL, colors, and icons.

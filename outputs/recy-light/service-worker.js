@@ -1,5 +1,5 @@
 const CACHE_PREFIX = 'recylight-shell-';
-const CACHE_NAME = `${CACHE_PREFIX}4`;
+const CACHE_NAME = `${CACHE_PREFIX}5`;
 const SHELL = [
   './', './index.html', './offline.html', './manifest.webmanifest',
   './styles.css', './hero.css', './hero-fill.css', './hero-banner.css',
@@ -30,7 +30,8 @@ self.addEventListener('message', event => {
 
 function isPrivatePath(pathname) {
   return /\/(?:admin(?:\.html|\.js|\.css|-login\.js|-login\.css)?|login\.html)(?:$|\/)/i.test(pathname)
-    || /\/api(?:\/|$)/i.test(pathname);
+    || /\/api(?:\/|$)/i.test(pathname)
+    || /^\/\.netlify\/identity(?:\/|$)/i.test(pathname);
 }
 
 function isSafeStatic(request, url) {

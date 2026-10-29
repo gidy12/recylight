@@ -14,6 +14,8 @@ py -m http.server 8000
 
 Then open <http://localhost:8000/>. There is no production build command. Deploy the folder contents to a static host configured for HTTPS.
 
+For Git-connected Netlify deployments, the repository-root `netlify.toml` clears the build command and publishes `outputs/recy-light`. These file-based settings override the dashboard settings, so Netlify does not attempt to execute the site directory. The root configuration also points to this folder's Edge Functions and preserves the admin route protection.
+
 ## PWA files and behavior
 
 - `manifest.webmanifest` declares the standalone app, launch URL, colors, and icons.

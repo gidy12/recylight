@@ -1,0 +1,12 @@
+[build]
+command = ""
+publish = "outputs/recy-light"
+edge_functions = "outputs/recy-light/netlify/edge-functions"
+
+[[edge_functions]]
+function = "admin-auth"
+path = "/admin.html"
+
+[[edge_functions]]
+function = "admin-auth"
+path = "/login.html"

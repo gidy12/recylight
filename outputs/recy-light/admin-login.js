@@ -17,7 +17,7 @@
       ? 'Create an administrator email and password for this browser.'
       : 'Sign in to manage the product catalog.';
     $('#confirm-password-field').hidden = !setupMode;
-    $('#admin-forgot-password').hidden = setupMode;
+    $('#admin-reset-access').hidden = setupMode;
     $('#admin-reset-note').hidden = true;
     $('#admin-reset-note').replaceChildren();
     $('#admin-confirm-password').required = setupMode;
@@ -71,21 +71,19 @@
     }
   });
 
-  $('#admin-forgot-password').addEventListener('click', () => {
+  $('#admin-reset-access').addEventListener('click', () => {
+    if (!confirm('Reset the local admin account for this browser? This keeps the catalog data but removes the saved login.')) return;
+    localStorage.removeItem(ACCOUNT_KEY);
+    sessionStorage.removeItem(SESSION_KEY);
+    $('#admin-email').value = '';
+    $('#admin-password').value = '';
+    $('#admin-confirm-password').value = '';
+    $('#login-error').textContent = '';
+    configure(false);
     const note = $('#admin-reset-note');
-    let settings = {};
-    try { settings = JSON.parse(localStorage.getItem('recylight-store-settings') || '{}'); } catch { /* Use support fallback. */ }
-    note.replaceChildren();
-    if (settings.email) {
-      note.append(document.createTextNode("Password recovery isn't available in this preview. Email RecyLight support at "));
-      const link = document.createElement('a');
-      link.href = `mailto:${settings.email}?subject=${encodeURIComponent('Admin password recovery')}`;
-      link.textContent = settings.email;
-      note.append(link, document.createTextNode('.'));
-    } else {
-      note.textContent = 'Password recovery is not connected yet. Please contact RecyLight support.';
-    }
+    note.textContent = 'Local access cleared. Create a new admin login for this browser.';
     note.hidden = false;
+    $('#admin-email').focus();
   });
 
   configure(Boolean(localStorage.getItem(ACCOUNT_KEY)));

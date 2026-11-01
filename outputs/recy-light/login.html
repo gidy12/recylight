@@ -19,7 +19,7 @@
       <form id="admin-login-form">
         <label>Email address<input id="admin-email" type="email" autocomplete="username" required placeholder="admin@example.com"></label>
         <label>Password<input id="admin-password" type="password" autocomplete="current-password" minlength="10" required placeholder="At least 10 characters"></label>
-        <button class="forgot-password" id="admin-forgot-password" type="button" hidden>Forgot password?</button>
+        <button class="forgot-password" id="admin-reset-access" type="button" hidden>Reset local admin access</button>
         <p class="reset-note" id="admin-reset-note" role="status" hidden></p>
         <label id="confirm-password-field" hidden>Confirm password<input id="admin-confirm-password" type="password" autocomplete="new-password" minlength="10" placeholder="Enter the password again"></label>
         <p class="login-error" id="login-error" role="alert"></p>
@@ -30,6 +30,6 @@
     </section>
     <p class="login-footnote">Local preview access only</p>
   </main>
-  <script src="admin-login.js"></script>
+  <script src="admin-login.js?v=2"></script>
 </body>
 </html>

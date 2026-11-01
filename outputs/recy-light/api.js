@@ -1,11 +1,12 @@
 // api.js — RecyLight backend API client
-// Dependency-free, native fetch. Configure base URL via window.RECYLIGHT_API_BASE_URL
-// (defaults to https://recylight-api.onrender.com — update before launch).
+// Dependency-free, native fetch. Vercel proxies /api to Render so session cookies stay first-party.
 //
 // Exposed as window.RecyLightAPI. Errors dispatch CustomEvent('recy:api-error').
 
 (function () {
-  const BASE_URL = (window.RECYLIGHT_API_BASE_URL || 'https://recylight-api.onrender.com').replace(/\/$/, '');
+  const isLocal = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+  const defaultBaseUrl = isLocal ? 'https://recylight-api.onrender.com' : '';
+  const BASE_URL = (window.RECYLIGHT_API_BASE_URL ?? defaultBaseUrl).replace(/\/$/, '');
 
   const emit = (name, detail) => window.dispatchEvent(new CustomEvent(name, { detail }));
   const queryString = params => {
@@ -43,7 +44,7 @@
     } catch (error) {
       if (error.name === 'TypeError') {
         emit('recy:api-error', {
-          message: 'Network/CORS error. API at ' + BASE_URL + ' unreachable from ' + window.location.origin + '. Check browser console (F12) for details.',
+          message: 'Network/CORS error. API at ' + (BASE_URL || window.location.origin) + ' unreachable from ' + window.location.origin + '. Check browser console (F12) for details.',
           path,
         });
         throw error;
@@ -58,7 +59,7 @@
     }
   }
   // ── Health check ──────────────────────────────────────────────
-  async function health() { return request('/'); }
+  async function health() { return request(BASE_URL ? '/' : '/api/health'); }
 
   // ── Customer authentication ───────────────────────────────────
   async function customerSignup(data) {

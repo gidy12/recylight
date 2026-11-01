@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/health",
+      "destination": "https://recylight-api.onrender.com/"
+    },
+    {
+      "source": "/api/:path*",
+      "destination": "https://recylight-api.onrender.com/api/:path*"
+    }
+  ]
+}

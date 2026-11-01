@@ -264,10 +264,18 @@
     const paymentMethod = formData.get('payment') || 'CASH_ON_DELIVERY';
     submit.disabled = true;
     feedback.textContent = '';
+    checkoutForm.querySelector('.checkout-whatsapp-fallback')?.remove();
 
     try {
       if (!window.RECYLIGHT_API_CATALOG_LOADED) {
-        throw new Error('Live catalog is unavailable. Please try again when the store API is back online.');
+        feedback.textContent = 'The live catalog is empty, so no order or payment was submitted. The products shown are examples; contact RecyLight to confirm current stock and prices.';
+        const whatsappButton = document.createElement('button');
+        whatsappButton.type = 'button';
+        whatsappButton.className = 'button button-green checkout-whatsapp-fallback';
+        whatsappButton.textContent = 'Send cart enquiry via WhatsApp';
+        whatsappButton.addEventListener('click', () => window.sendWhatsAppOrder?.());
+        feedback.after(whatsappButton);
+        return;
       }
       const items = cartLines().map(({ p, qty }) => ({ productId: p.id, quantity: qty }));
       if (!items.length) throw new Error('Your cart is empty.');

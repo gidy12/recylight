@@ -1,6 +1,6 @@
 // Preview catalog only. Replace this fixture with the team's catalog service before launch.
 let PRODUCTS = loadProducts();
-function loadProducts(){try{const saved=JSON.parse(localStorage.getItem('recylight-products'));return Array.isArray(saved)?saved:window.RECYLIGHT_DEFAULT_PRODUCTS.map(product=>({...product}))}catch{return window.RECYLIGHT_DEFAULT_PRODUCTS.map(product=>({...product}))}}
+function loadProducts(){try{const saved=JSON.parse(localStorage.getItem('recylight-products'));return Array.isArray(saved)&&saved.length?saved:window.RECYLIGHT_DEFAULT_PRODUCTS.map(product=>({...product}))}catch{return window.RECYLIGHT_DEFAULT_PRODUCTS.map(product=>({...product}))}}
 
 function normalizeProduct(p){const category=typeof p.category==='object'?p.category?.name:p.category;const image=Array.isArray(p.images)?p.images[0]?.url:'';return{id:String(p.id||p._id||p.slug||''),name:p.name||p.title||'Product',category:category||'All',brand:p.brand||'',price:Number(p.price||0),was:p.discountPrice||p.was||p.originalPrice||null,stock:Number(p.stockQuantity??p.stock??p.quantity??0),image:p.image||p.imageUrl||p.photo||image,alt:p.alt||p.name||'Product',description:p.description||'',badge:p.badge||(p.isFeatured?'Featured':null)}}
 

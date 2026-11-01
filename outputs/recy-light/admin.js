@@ -185,10 +185,22 @@
           const decision = verifyButton.dataset.paymentDecision;
           const paymentId = verifyButton.dataset.paymentId;
           if (!confirm(`${decision} this payment after verifying it in MTN merchant records?`)) return;
-          await window.RecyLightAPI.verifyPayment(paymentId, decision);
-          notify(`Payment ${decision.toLowerCase()}d.`);
-          await loadPendingPayments();
-          await loadDashboard();
+          const reason = decision === 'REJECT'
+            ? window.prompt('Enter the reason this payment could not be verified:')
+            : '';
+          if (decision === 'REJECT' && !reason?.trim()) {
+            notify('A rejection reason is required.');
+            return;
+          }
+          verifyButton.disabled = true;
+          try {
+            await window.RecyLightAPI.verifyPayment(paymentId, decision, reason?.trim());
+            notify(decision === 'APPROVE' ? 'Payment approved.' : 'Payment rejected.');
+            await loadPendingPayments();
+            await loadDashboard();
+          } finally {
+            if (verifyButton.isConnected) verifyButton.disabled = false;
+          }
         }
       } catch (error) { notify(error.message || 'The API request failed.'); }
     });
@@ -220,9 +232,13 @@
   async function loadPendingPayments() {
     const content = ensureOrderPanel();
     const payments = apiList(await window.RecyLightAPI.getPendingPayments(), 'payments');
-    content.querySelector('.admin-pending-payments').innerHTML = payments.length ? `<table><thead><tr><th>Order</th><th>Phone</th><th>Reference</th><th>Amount</th><th></th></tr></thead><tbody>${payments.map(payment => {
+    content.querySelector('.admin-pending-payments').innerHTML = payments.length ? `<table><thead><tr><th>Customer</th><th>Order</th><th>Phone</th><th>Reference</th><th>Amount</th><th>Submitted</th><th>Status</th><th></th></tr></thead><tbody>${payments.map(payment => {
       const id = payment.id || payment.paymentId;
-      return `<tr><td>${escapeHtml(payment.orderNumber || payment.order?.orderNumber || '')}</td><td>${escapeHtml(payment.phone || '')}</td><td>${escapeHtml(payment.transactionReference || '')}</td><td>${currency(payment.amount)}</td><td><button type="button" data-payment-decision="APPROVE" data-payment-id="${escapeHtml(id)}">Approve</button><button type="button" data-payment-decision="REJECT" data-payment-id="${escapeHtml(id)}">Reject</button></td></tr>`;
+      const customer = payment.customerName || payment.customer?.name || payment.order?.customerName || payment.order?.customer?.name || 'Customer';
+      const orderNumber = payment.orderNumber || payment.order?.orderNumber || payment.order?.order_number || '';
+      const submitted = payment.createdAt || payment.submittedAt;
+      const submittedLabel = submitted && !Number.isNaN(Date.parse(submitted)) ? new Date(submitted).toLocaleString() : 'Date unavailable';
+      return `<tr><td>${escapeHtml(customer)}</td><td>${escapeHtml(orderNumber)}</td><td>${escapeHtml(payment.phone || payment.order?.phone || '')}</td><td>${escapeHtml(payment.transactionReference || '')}</td><td>${currency(payment.amount)}</td><td>${escapeHtml(submittedLabel)}</td><td>Pending</td><td><button type="button" data-payment-decision="APPROVE" data-payment-id="${escapeHtml(id)}">Approve</button><button type="button" data-payment-decision="REJECT" data-payment-id="${escapeHtml(id)}">Reject</button></td></tr>`;
     }).join('')}</tbody></table>` : '<p>No pending manual payments.</p>';
   }
 

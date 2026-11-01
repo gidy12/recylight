@@ -176,8 +176,49 @@
 
   const orderList = document.createElement('section');
   orderList.className = 'account-orders';
-  orderList.innerHTML = '<h3>Recent orders</h3><p class="account-orders-status" role="status"></p><div class="account-orders-list"></div>';
+  orderList.innerHTML = '<h3>Recent orders</h3><p class="account-orders-status" role="status"></p><div class="account-orders-list"></div><form class="account-order-lookup"><h3>Track an order</h3><label>Order number<input name="orderNumber" required autocomplete="off"></label><label>Checkout phone number<input name="phone" required type="tel" autocomplete="tel"></label><button type="submit">Find order</button><p class="order-lookup-status" role="status"></p><div class="order-lookup-details"></div></form>';
   $('#account-profile').append(orderList);
+
+  orderList.querySelector('.account-order-lookup').addEventListener('submit', async event => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    if (!form.reportValidity()) return;
+    const button = form.querySelector('button[type="submit"]');
+    const status = form.querySelector('.order-lookup-status');
+    const details = form.querySelector('.order-lookup-details');
+    const values = new FormData(form);
+    button.disabled = true;
+    status.textContent = 'Looking up order…';
+    details.replaceChildren();
+    try {
+      const response = unwrap(await api.getOrder(String(values.get('orderNumber')).trim(), String(values.get('phone')).trim()));
+      const order = response?.order || response;
+      const payment = order.latestPayment || order.payment || order.payments?.[0] || {};
+      const rawPaymentStatus = order.paymentStatus || payment.status || 'UNPAID';
+      const paymentStatus = ({ PENDING_REVIEW: 'PENDING', SUCCESSFUL: 'VERIFIED', FAILED: 'REJECTED' })[rawPaymentStatus] || rawPaymentStatus;
+      const rows = [
+        ['Order', order.orderNumber || order.order_number || order.id],
+        ['Order date', order.createdAt || order.created_at ? new Date(order.createdAt || order.created_at).toLocaleDateString() : 'Unavailable'],
+        ['Total', `RWF ${Number(order.totalAmount ?? order.total ?? order.subtotal ?? 0).toLocaleString('en-US')}`],
+        ['Payment method', order.paymentMethod || order.payment_method || 'Unavailable'],
+        ['Payment status', paymentStatus],
+        ['Order status', order.status || 'PENDING'],
+      ];
+      rows.forEach(([label, value]) => {
+        const row = document.createElement('p');
+        row.textContent = `${label}: ${value}`;
+        details.append(row);
+      });
+      (order.items || []).forEach(item => {
+        const row = document.createElement('p');
+        row.textContent = `${item.productName || item.product_name || item.name || 'Item'} × ${item.quantity}`;
+        details.append(row);
+      });
+      status.textContent = '';
+    } catch (error) {
+      status.textContent = error.message || 'Order not found. Check the order number and checkout phone.';
+    } finally { button.disabled = false; }
+  });
 
   window.addEventListener('recy:auth-change', async event => {
     if (!event.detail) {

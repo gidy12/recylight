@@ -121,8 +121,11 @@
     return request(`/api/v1/payments/${encodeURIComponent(paymentId)}/status${queryString({ phone })}`);
   }
   async function getPendingPayments() { return request('/api/v1/payments/admin/pending'); }
-  async function verifyPayment(paymentId, decision) {
-    return request(`/api/v1/payments/${encodeURIComponent(paymentId)}/verify`, { method: 'PATCH', body: { decision } });
+  async function verifyPayment(paymentId, decision, reason) {
+    return request(`/api/v1/payments/${encodeURIComponent(paymentId)}/verify`, {
+      method: 'PATCH',
+      body: { decision, ...(reason ? { reason } : {}) },
+    });
   }
   // ── Admin dashboard ───────────────────────────────────────────
   async function getAdminDashboard() { return request('/api/v1/admin/dashboard'); }

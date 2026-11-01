@@ -193,8 +193,15 @@
       const orders = Array.isArray(response) ? response : response?.orders || [];
       status.textContent = orders.length ? '' : 'No orders found.';
       list.replaceChildren(...orders.map(order => {
-        const row = document.createElement('p');
-        row.textContent = `${order.orderNumber || order.order_number || order.id} · ${order.status || 'Pending'} · RWF ${Number(order.total || order.totalAmount || 0).toLocaleString('en-US')}`;
+        const row = document.createElement('article');
+        row.className = 'account-order-item';
+        const number = order.orderNumber || order.order_number || order.id;
+        const rawPaymentStatus = order.paymentStatus || order.latestPayment?.status || order.payments?.[0]?.status || 'UNPAID';
+        const paymentStatus = ({ PENDING_REVIEW: 'PENDING', SUCCESSFUL: 'VERIFIED', FAILED: 'REJECTED' })[rawPaymentStatus] || rawPaymentStatus;
+        const orderDate = order.createdAt || order.created_at;
+        const dateLabel = orderDate && !Number.isNaN(Date.parse(orderDate)) ? new Date(orderDate).toLocaleDateString() : 'Date unavailable';
+        const total = Number(order.totalAmount ?? order.total ?? order.subtotal ?? 0).toLocaleString('en-US');
+        row.textContent = `Order #${number} · ${dateLabel} · RWF ${total} · ${order.paymentMethod || order.payment_method || 'Payment method unavailable'} · Payment: ${paymentStatus} · Order: ${order.status || 'PENDING'}`;
         return row;
       }));
     } catch (error) {
@@ -236,8 +243,12 @@
       const order = unwrap(response);
       const orderNumber = order?.orderNumber || order?.order_number || order?.order?.orderNumber || order?.order?.order_number;
       if (!orderNumber) throw new Error('Order was created but the API did not return an order number.');
-      feedback.textContent = `Order ${orderNumber} created. The team will confirm availability and delivery.`;
-      if (paymentMethod === 'MTN_MOMO_MANUAL') addPaymentReferenceForm(orderNumber, phone, feedback);
+      const savedOrder = order.order || order;
+      const amountDue = Number(savedOrder.totalAmount ?? savedOrder.total ?? savedOrder.subtotal ?? cartTotal());
+      feedback.textContent = paymentMethod === 'MTN_MOMO_MANUAL'
+        ? `Order ${orderNumber} created. Amount to pay: RWF ${amountDue.toLocaleString('en-US')}.`
+        : `Order ${orderNumber} created. The team will confirm availability and delivery.`;
+      if (paymentMethod === 'MTN_MOMO_MANUAL') addPaymentReferenceForm(orderNumber, phone, amountDue, feedback);
       cartLines().forEach(({ p }) => { delete cart[p.id]; });
       updateCart();
     } catch (error) {
@@ -248,12 +259,12 @@
     }
   }, true);
 
-  function addPaymentReferenceForm(orderNumber, phone, feedback) {
+  function addPaymentReferenceForm(orderNumber, phone, amountDue, feedback) {
     document.querySelector('#manual-payment-reference')?.remove();
     const section = document.createElement('section');
     section.id = 'manual-payment-reference';
     const instruction = document.createElement('p');
-    instruction.textContent = 'Pay using the merchant USSD code *182*8*1*011115#, then submit your MTN transaction reference for review.';
+    instruction.textContent = `Order #${orderNumber} · Amount due: RWF ${amountDue.toLocaleString('en-US')}. On your phone, use the MTN MoMo merchant code *182*8*1*011115# to pay this exact amount. After payment, enter the transaction ID below. Your order remains unconfirmed until RecyLight verifies the payment.`;
     const label = document.createElement('label');
     label.textContent = 'MTN transaction reference';
     const input = document.createElement('input');
@@ -275,7 +286,8 @@
           phone,
           transactionReference: input.value.trim(),
         }));
-        feedback.textContent = `Payment reference received. Status: ${result.status || 'PENDING_REVIEW'}. An administrator will verify it.`;
+        const orderStatus = result.status === 'PENDING_REVIEW' ? 'PENDING' : result.status || 'PENDING';
+        feedback.textContent = `Your payment confirmation has been submitted successfully. Our team will verify your payment. You will receive an email notification once your payment has been confirmed. Please wait for verification before considering your order confirmed.\nOrder number: #${orderNumber}\nPayment status: ${orderStatus}.`;
         section.remove();
       } catch (error) {
         feedback.textContent = error.message || 'Could not submit the payment reference.';

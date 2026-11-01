@@ -1,5 +1,5 @@
 const CACHE_PREFIX = 'recylight-shell-';
-const CACHE_NAME = `${CACHE_PREFIX}7`;
+const CACHE_NAME = `${CACHE_PREFIX}8`;
 const SHELL = [
   './', './index.html', './offline.html', './manifest.webmanifest',
   './styles.css', './hero.css', './hero-fill.css', './hero-banner.css',

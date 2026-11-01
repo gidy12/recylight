@@ -38,7 +38,11 @@
         });
         throw error;
       }
-      console.error('[RecyLightAPI] ✕', method, url, error.name, error.message);
+      console.error(`[RecyLightAPI] ✕ ${method} ${url} | Status: ${error.status ?? 'N/A'}`, {
+        name: error.name,
+        message: error.message,
+        data: error.data ?? error.responseText ?? null,
+      });
       emit('recy:api-error', { message: error.message, path, status: error.status, data: error.data });
       throw error;
     }

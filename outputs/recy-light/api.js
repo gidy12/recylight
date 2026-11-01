@@ -48,13 +48,16 @@
 
   // ── Customer authentication ───────────────────────────────────
   async function customerSignup(data) {
-    const phone = data.phone || document.querySelector('#account-phone')?.value.trim();
+    const name = data.name || data.full_name;
+    const phone = (data.phone || document.querySelector('#account-phone')?.value || '').trim();
     const confirmPassword = data.confirmPassword || document.querySelector('#account-confirm-password')?.value || data.password;
+    if (!name) throw new Error('Enter your full name.');
+    if (!phone) throw new Error('Enter your phone number to create an account.');
     if (data.password !== confirmPassword) throw new Error('The passwords do not match.');
     return request('/api/v1/auth/customer/signup', {
       method: 'POST',
       body: {
-        name: data.name || data.full_name,
+        name,
         email: data.email,
         phone,
         password: data.password,

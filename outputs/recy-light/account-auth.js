@@ -17,14 +17,6 @@ if (!api) {
 
   window.RecyLightAuth = {
     getUser,
-    login: async (email, password) => {
-      await api.customerLogin({ email, password });
-      return getUser();
-    },
-    signup: async (email, password, metadata = {}) => {
-      await api.customerSignup({ email, password, name: metadata.full_name });
-      return getUser();
-    },
     logout: api.customerLogout,
     requestPasswordRecovery: email => api.customerForgotPassword({ email }),
     updateUser: async () => {

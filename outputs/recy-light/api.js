@@ -70,7 +70,10 @@
     });
   }
   async function customerLogin(data) {
-    return request('/api/v1/auth/customer/login', { method: 'POST', body: data });
+    return request('/api/v1/auth/customer/login', {
+      method: 'POST',
+      body: { email: data.email, password: data.password },
+    });
   }
   async function customerLogout() { return request('/api/v1/auth/customer/logout', { method: 'POST' }); }
   async function customerMe() { return request('/api/v1/auth/customer/me'); }

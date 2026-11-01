@@ -20,7 +20,7 @@
     const url = `${BASE_URL}${path}`;
     const config = {
       method,
-      headers: { 'Content-Type': 'application/json', ...headers },
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', ...headers },
     };
     if (auth) {
       const token = getToken();
@@ -36,18 +36,18 @@
         const err = new Error(data.message || `Request failed (${response.status})`);
         err.status = response.status;
         err.data = data;
-        throw err;
+        err.responseText = JSON.stringify(data);
       }
       return data;
     } catch (error) {
       if (error.name === 'TypeError') {
         emit('recy:api-error', {
-          message: 'Network error. Is the API server at ' + BASE_URL + ' reachable?',
+          message: 'Network error. Is the API server at ' + BASE_URL + ' reachable? CORS may be blocking the request.',
           path,
         });
         throw error;
       }
-      emit('recy:api-error', { message: error.message, path, status: error.status });
+      emit('recy:api-error', { message: error.message, path, status: error.status, data: error.data });
       throw error;
     }
   }

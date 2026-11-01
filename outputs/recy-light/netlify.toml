@@ -1,7 +1,0 @@
-[[edge_functions]]
-function = "admin-auth"
-path = "/admin.html"
-
-[[edge_functions]]
-function = "admin-auth"
-path = "/login.html"

@@ -18,18 +18,19 @@
       <p class="login-intro" id="login-intro">Sign in to manage the product catalog.</p>
       <form id="admin-login-form">
         <label>Email address<input id="admin-email" type="email" autocomplete="username" required placeholder="admin@example.com"></label>
-        <label>Password<input id="admin-password" type="password" autocomplete="current-password" minlength="10" required placeholder="At least 10 characters"></label>
+        <label>Password<input id="admin-password" type="password" autocomplete="current-password" required placeholder="Your password"></label>
         <button class="forgot-password" id="admin-forgot-password" type="button" hidden>Forgot password?</button>
         <p class="reset-note" id="admin-reset-note" role="status" hidden></p>
         <label id="confirm-password-field" hidden>Confirm password<input id="admin-confirm-password" type="password" autocomplete="new-password" minlength="10" placeholder="Enter the password again"></label>
         <p class="login-error" id="login-error" role="alert"></p>
         <button class="login-submit" id="login-submit" type="submit">Sign in <span aria-hidden="true">→</span></button>
       </form>
-      <p class="login-security-note" id="security-note">Your password stays in this browser. This local preview does not replace secure server-side admin authentication.</p>
+      <p class="login-security-note" id="security-note">Administrator access is verified by the RecyLight API.</p>
       <a class="storefront-link" href="index.html">← Return to storefront</a>
     </section>
-    <p class="login-footnote">Local browser access only · connect a secure backend before launch</p>
+    <p class="login-footnote">Secure administrator access</p>
   </main>
+  <script src="api.js"></script>
   <script src="admin-login.js"></script>
 </body>
 </html>

@@ -1,8 +1,11 @@
-(() => {
-  if (sessionStorage.getItem('recy-admin-session') !== 'active') {
+(async () => {
+  try {
+    await window.RecyLightAPI.adminMe();
+  } catch {
     location.replace('login.html');
     return;
   }
+  document.documentElement.classList.add('admin-unlocked');
 
   const STORAGE_KEY = 'recylight-products';
   const $ = selector => document.querySelector(selector);
@@ -249,9 +252,8 @@
       $('#settings-feedback').textContent = 'Could not save settings. Browser storage may be unavailable.';
     }
   });
-  $('#admin-logout').addEventListener('click', () => {
-    sessionStorage.removeItem('recy-admin-session');
-    location.replace('login.html');
+  $('#admin-logout').addEventListener('click', async () => {
+    try { await window.RecyLightAPI.adminLogout(); } finally { location.replace('login.html'); }
   });
   render();
 })();

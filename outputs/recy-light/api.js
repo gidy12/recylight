@@ -6,26 +6,16 @@
 
 (function () {
   const BASE_URL = (window.RECYLIGHT_API_BASE_URL || 'https://recylight-api.onrender.com').replace(/\/$/, '');
-  const TOKEN_KEY = 'recylight-api-token';
 
   const emit = (name, detail) => window.dispatchEvent(new CustomEvent(name, { detail }));
-
-  function getToken() { return localStorage.getItem(TOKEN_KEY); }
-  function setToken(token) {
-    if (token) localStorage.setItem(TOKEN_KEY, token);
-    else localStorage.removeItem(TOKEN_KEY);
-  }
 
   async function request(path, { method = 'GET', body, headers = {}, auth = true } = {}) {
     const url = `${BASE_URL}${path}`;
     const config = {
       method,
+      credentials: 'include',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', ...headers },
     };
-    if (auth) {
-      const token = getToken();
-      if (token) config.headers.Authorization = `Bearer ${token}`;
-    }
     if (body && method !== 'GET') config.body = JSON.stringify(body);
 
     try {
@@ -58,16 +48,24 @@
 
   // ── Customer authentication ───────────────────────────────────
   async function customerSignup(data) {
-    return request('/api/v1/auth/customer/signup', { method: 'POST', body: data });
+    const phone = data.phone || document.querySelector('#account-phone')?.value.trim();
+    const confirmPassword = data.confirmPassword || document.querySelector('#account-confirm-password')?.value || data.password;
+    if (data.password !== confirmPassword) throw new Error('The passwords do not match.');
+    return request('/api/v1/auth/customer/signup', {
+      method: 'POST',
+      body: {
+        name: data.name || data.full_name,
+        email: data.email,
+        phone,
+        password: data.password,
+        confirmPassword,
+      },
+    });
   }
   async function customerLogin(data) {
-    const result = await request('/api/v1/auth/customer/login', { method: 'POST', body: data });
-    if (result.token) setToken(result.token);
-    return result;
+    return request('/api/v1/auth/customer/login', { method: 'POST', body: data });
   }
-  async function customerLogout() {
-    try { await request('/api/v1/auth/customer/logout', { method: 'POST' }); } finally { setToken(null); }
-  }
+  async function customerLogout() { return request('/api/v1/auth/customer/logout', { method: 'POST' }); }
   async function customerMe() { return request('/api/v1/auth/customer/me'); }
   async function customerForgotPassword(data) {
     return request('/api/v1/auth/customer/forgot-password', { method: 'POST', body: data });
@@ -76,14 +74,8 @@
     return request('/api/v1/auth/customer/reset-password', { method: 'POST', body: data });
   }
   // ── Admin authentication ──────────────────────────────────────
-  async function adminLogin(data) {
-    const result = await request('/api/v1/auth/admin/login', { method: 'POST', body: data });
-    if (result.token) setToken(result.token);
-    return result;
-  }
-  async function adminLogout() {
-    try { await request('/api/v1/auth/admin/logout', { method: 'POST' }); } finally { setToken(null); }
-  }
+  async function adminLogin(data) { return request('/api/v1/auth/admin/login', { method: 'POST', body: data }); }
+  async function adminLogout() { return request('/api/v1/auth/admin/logout', { method: 'POST' }); }
   async function adminMe() { return request('/api/v1/auth/admin/me'); }
 
   // ── Public product catalog ────────────────────────────────────
@@ -137,6 +129,5 @@
     getAdminCategories, createAdminCategory, patchAdminCategory, deleteAdminCategory,
     getAdminOrders, getAdminOrder, patchAdminOrderStatus,
     getAdminReports, getAdminSalesReports,
-    setToken, getToken,
   };
 })();

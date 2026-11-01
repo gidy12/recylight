@@ -37,16 +37,18 @@
         err.status = response.status;
         err.data = data;
         err.responseText = JSON.stringify(data);
+        throw err;
       }
       return data;
     } catch (error) {
       if (error.name === 'TypeError') {
         emit('recy:api-error', {
-          message: 'Network error. Is the API server at ' + BASE_URL + ' reachable? CORS may be blocking the request.',
+          message: 'Network/CORS error. API at ' + BASE_URL + ' unreachable from ' + window.location.origin + '. Check browser console (F12) for details.',
           path,
         });
         throw error;
       }
+      console.error('[RecyLightAPI] ✕', method, url, error.name, error.message);
       emit('recy:api-error', { message: error.message, path, status: error.status, data: error.data });
       throw error;
     }

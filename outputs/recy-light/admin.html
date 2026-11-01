@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow"><meta name="theme-color" content="#101c2a"><title>Admin dashboard — RecyLight</title>
-<link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="navbar.css"><link rel="stylesheet" href="admin.css">
+<link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="navbar.css"><link rel="stylesheet" href="admin.css"><script>if(sessionStorage.getItem('recy-admin-session')!=='active')location.replace('login.html');else document.documentElement.classList.add('admin-unlocked')</script>
 </head>
 <body class="admin-page">
 <header class="admin-top"><a class="brand" href="index.html"><span>Recy<span class="brand-light">Light</span><small>PRODUCT ADMIN</small></span></a><div class="admin-top-actions"><a class="admin-back" href="index.html">← Back to storefront</a><button class="admin-logout" id="admin-logout" type="button">Log out</button></div></header>
 <main class="admin-main">
 <header class="admin-heading"><div><span class="eyebrow">RECYLIGHT CATALOG</span><h1 id="admin-page-title">Overview</h1><p id="admin-page-description">A quick look at your storefront catalog.</p></div><div class="admin-stats"><span><b id="product-total">0</b> products</span><span><b id="stock-total">0</b> items in stock</span></div></header>
-<div class="admin-preview-note"><b>Connected to RecyLight API</b><span>Catalog, order, and report data are loaded from the server. Store settings remain local to this browser.</span></div>
+<div class="admin-preview-note"><b>Local preview dashboard</b><span>Sign-in and product changes are local to this browser. Orders and reports need a secure server connection to appear here.</span></div>
 <div class="admin-dashboard-shell">
 <nav class="admin-sidebar" aria-label="Admin sections" role="tablist"><button class="admin-nav-item active" type="button" role="tab" aria-selected="true" data-admin-view="overview"><span>▦</span>Overview</button><button class="admin-nav-item" type="button" role="tab" aria-selected="false" data-admin-view="products"><span>□</span>Products &amp; stock</button><button class="admin-nav-item" type="button" role="tab" aria-selected="false" data-admin-view="orders"><span>▤</span>Orders</button><button class="admin-nav-item" type="button" role="tab" aria-selected="false" data-admin-view="quotes"><span>◇</span>Report</button><button class="admin-nav-item" type="button" role="tab" aria-selected="false" data-admin-view="settings"><span>⚙</span>Store settings</button></nav>
 <div class="admin-content">
@@ -24,5 +24,5 @@
 <section class="admin-view" id="view-settings" role="tabpanel" hidden><section class="admin-panel settings-panel"><div class="panel-heading"><div><span class="eyebrow">STORE PROFILE</span><h2>Store settings</h2></div></div><form id="store-settings-form" class="settings-form"><label>Store name<input id="setting-store-name" maxlength="80" required value="RecyLight Ltd"></label><label>Store tagline<input id="setting-tagline" maxlength="120" value="Powering brighter choices"></label><div class="form-row"><label>Support email<input id="setting-email" type="email" placeholder="support@example.com"></label><label>Support phone<input id="setting-phone" type="tel" placeholder="+250 7xx xxx xxx"></label></div><label>WhatsApp order number<input id="setting-whatsapp" type="tel" inputmode="tel" placeholder="+250 7xx xxx xxx" autocomplete="tel"><small>Use the full international number. The cart will open WhatsApp with the customer's item list; no payment is processed here.</small></label><label>Currency<select id="setting-currency"><option value="RWF">RWF — Rwandan franc</option><option value="KES">KES — Kenyan shilling</option><option value="TZS">TZS — Tanzanian shilling</option><option value="USD">USD — US dollar</option></select></label><p class="settings-hint">These settings are stored locally in this browser.</p><button class="admin-save" type="submit">Save settings</button><p class="settings-feedback" id="settings-feedback" role="status"></p></form></section></section>
 </div></div>
 </main><div class="admin-toast" id="admin-toast" role="status" aria-live="polite"></div>
-<script src="products-data.js"></script><script src="api.js?v=11"></script><script src="admin.js?v=9"></script>
+<script src="products-data.js"></script><script src="admin.js"></script>
 </body></html>

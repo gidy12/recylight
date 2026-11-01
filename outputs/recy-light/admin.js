@@ -453,7 +453,7 @@
     $('#setting-tagline').value = settings.tagline || 'Powering brighter choices';
     $('#setting-email').value = settings.email || '';
     $('#setting-phone').value = settings.phone || '';
-    $('#setting-whatsapp').value = settings.whatsapp || '';
+    $('#setting-whatsapp').value = settings.whatsapp || '+250 783 437 871';
     $('#setting-currency').value = settings.currency || 'RWF';
   } catch {}
   $('#store-settings-form').addEventListener('submit', event => {

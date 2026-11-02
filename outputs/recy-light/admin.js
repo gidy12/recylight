@@ -11,6 +11,7 @@
   let products = [];
   let categories = [];
   let currentImage = '';
+  let pendingImageFile = null;
   let toastTimer;
 
   function apiData(response) { return response?.data ?? response; }
@@ -306,6 +307,7 @@
     $('#product-stock').value = '1';
     $('#product-status').value = 'DRAFT';
     $('#product-image-file').value = '';
+    pendingImageFile = null;
     $('#form-title').textContent = 'Add a product';
     $('#save-product').textContent = 'Save product';
     $('#cancel-edit').hidden = true;
@@ -328,6 +330,7 @@
     $('#product-status').value = item.status;
     $('#product-image-url').value = item.image && !item.image.startsWith('data:') ? item.image : '';
     $('#product-image-file').value = '';
+    pendingImageFile = null;
     $('#form-title').textContent = 'Edit product';
     $('#save-product').textContent = 'Save changes';
     $('#cancel-edit').hidden = false;
@@ -361,9 +364,14 @@
     const canvas = document.createElement('canvas');
     canvas.width = Math.max(1, Math.round(bitmap.width * scale));
     canvas.height = Math.max(1, Math.round(bitmap.height * scale));
-    canvas.getContext('2d').drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    const context = canvas.getContext('2d');
+    if (!context) throw new Error('Could not prepare this image for upload.');
+    context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
     bitmap.close?.();
-    return canvas.toDataURL('image/jpeg', .82);
+    const preview = canvas.toDataURL('image/jpeg', .82);
+    const resizedFile = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', .82));
+    if (!resizedFile) throw new Error('Could not prepare this image for upload.');
+    return { preview, file: resizedFile };
   }
 
   $('#product-image-file').addEventListener('change', async event => {
@@ -371,7 +379,9 @@
     if (!file) return;
     $('#form-error').textContent = '';
     try {
-      showImage(await resizeImage(file));
+      const resized = await resizeImage(file);
+      pendingImageFile = resized.file;
+      showImage(resized.preview);
       $('#product-image-url').value = '';
     } catch (error) {
       event.target.value = '';
@@ -380,6 +390,7 @@
   });
 
   $('#product-image-url').addEventListener('input', event => {
+    pendingImageFile = null;
     showImage(event.target.value.trim());
     $('#product-image-file').value = '';
   });
@@ -400,26 +411,29 @@
     if (!event.currentTarget.reportValidity()) return;
     const oldId = $('#product-id').value;
     const name = $('#product-name').value.trim();
-    if (currentImage.startsWith('data:')) {
-      $('#form-error').textContent = 'The API accepts image URLs only. Enter a hosted image URL instead of uploading a file.';
-      return;
-    }
-    const discountPrice = Number($('#product-was').value);
-    const payload = {
-      name,
-      categoryId: $('#product-category').value || null,
-      brand: $('#product-brand').value.trim(),
-      price: Number($('#product-price').value),
-      ...(discountPrice > 0 ? { discountPrice } : {}),
-      stockQuantity: Number($('#product-stock').value),
-      status: $('#product-status').value,
-      isFeatured: Boolean($('#product-badge').value.trim()),
-      description: $('#product-description').value.trim(),
-      images: currentImage ? [currentImage] : [],
-    };
     const submit = $('#save-product');
     submit.disabled = true;
     try {
+      if (pendingImageFile) {
+        currentImage = await window.RecyLightAPI.uploadAdminImage(pendingImageFile);
+        pendingImageFile = null;
+      }
+      if (currentImage.startsWith('data:')) {
+        throw new Error('This image is not hosted yet. Select the photo again to upload it.');
+      }
+      const discountPrice = Number($('#product-was').value);
+      const payload = {
+        name,
+        categoryId: $('#product-category').value || null,
+        brand: $('#product-brand').value.trim(),
+        price: Number($('#product-price').value),
+        ...(discountPrice > 0 ? { discountPrice } : {}),
+        stockQuantity: Number($('#product-stock').value),
+        status: $('#product-status').value,
+        isFeatured: Boolean($('#product-badge').value.trim()),
+        description: $('#product-description').value.trim(),
+        images: currentImage ? [currentImage] : [],
+      };
       if (oldId) await window.RecyLightAPI.patchAdminProduct(oldId, payload);
       else await window.RecyLightAPI.createAdminProduct(payload);
       await loadProducts();

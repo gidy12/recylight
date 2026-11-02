@@ -28,7 +28,8 @@ Then open <http://localhost:8000/>. There is no production build command. Deploy
 - Responsive product catalog with product search, categories, sort, stock display, and an accessible product details dialog.
 - Cart with quantity controls and local browser persistence.
 - Customer and administrator authentication use the Render API and cookie-based sessions. The browser sends API requests with credentials enabled.
-- Admin catalog edits and Store settings remain local to the current browser. The admin API endpoints for shared catalog, orders and reports are not yet wired into the dashboard.
+- Admin product photos can be selected as local files; the browser resizes them and uploads them to `POST /api/v1/admin/uploads` as multipart field `file`. The endpoint must return a hosted image URL (for example, `{ "data": { "url": "https://..." } }`), which is then saved with the product. Set `window.RECYLIGHT_ADMIN_IMAGE_UPLOAD_PATH` before `api.js` loads if the backend uses a different route.
+- Admin product and category changes use the API, including hosted product photos. Store settings remain local to the current browser.
 - Admin Store settings can hold a public WhatsApp order number. When configured, the cart builds a WhatsApp click-to-chat enquiry for mobile WhatsApp or desktop WhatsApp Web. Customers still need to review and send the message. It is not payment processing or a confirmed order.
 
 ## Production requirements still outstanding

@@ -164,9 +164,10 @@
     let content = panel.querySelector('.admin-orders-content');
     if (content) return content;
     panel.querySelector('.request-empty')?.remove();
+    panel.querySelector('.panel-heading')?.remove();
     content = document.createElement('div');
     content.className = 'admin-orders-content';
-    content.innerHTML = '<form class="admin-order-filters"><label>Search<input type="search" name="search" placeholder="Order, customer, phone, email"></label><label>Status<select name="status"><option value="">All statuses</option></select></label><button type="submit">Search</button></form><div class="admin-orders-table"></div><h3>Manual payments awaiting review</h3><div class="admin-pending-payments"></div>';
+    content.innerHTML = '<div class="admin-workspace-heading"><div><span class="eyebrow">ORDER MANAGEMENT</span><h3>Customer orders</h3><p>Review checkout activity and keep order progress up to date.</p></div></div><form class="admin-order-filters"><label>Search orders<input type="search" name="search" placeholder="Order number, customer, phone or email"></label><label>Order status<select name="status"><option value="">All statuses</option></select></label><button type="submit">Apply filters</button></form><section class="admin-data-section"><div class="admin-section-heading"><div><h3>All orders</h3><p>Order details and fulfillment status</p></div></div><div class="admin-orders-table"></div></section><section class="admin-payment-review"><div class="admin-section-heading"><div><span class="eyebrow">MANUAL MTN MOMO</span><h3>Payments awaiting review</h3><p>Verify each transaction against merchant records before approving.</p></div></div><div class="admin-pending-payments"></div></section>';
     orderStatuses.forEach(status => content.querySelector('select[name="status"]').add(new Option(status, status)));
     panel.append(content);
     content.querySelector('.admin-order-filters').addEventListener('submit', event => {
@@ -227,29 +228,30 @@
       status: formData.get('status') || undefined,
     });
     const orders = apiList(response, 'orders');
-    content.querySelector('.admin-orders-table').innerHTML = orders.length ? `<table><thead><tr><th>Order</th><th>Customer</th><th>Total</th><th>Payment</th><th>Status</th><th></th></tr></thead><tbody>${orders.map(order => {
+    content.querySelector('.admin-orders-table').innerHTML = orders.length ? `<div class="admin-table-wrap"><table><thead><tr><th>Order</th><th>Customer</th><th>Total</th><th>Payment</th><th>Status</th><th>Actions</th></tr></thead><tbody>${orders.map(order => {
       const id = order.id || order.orderNumber || order.order_number;
       const orderNumber = order.orderNumber || order.order_number || id;
       const customer = order.customerName || order.customer?.name || 'Customer';
       const total = Number(order.totalAmount ?? order.total ?? order.subtotal ?? 0);
       const paymentStatus = order.paymentStatus || order.latestPayment?.status || 'UNPAID';
+      const paymentClass = String(paymentStatus).toLowerCase().replace(/[^a-z0-9-]/g, '');
       const options = orderStatuses.map(status => `<option value="${status}"${status === order.status ? ' selected' : ''}>${status}</option>`).join('');
-      return `<tr><td>${escapeHtml(orderNumber)}</td><td>${escapeHtml(customer)}</td><td>${currency(total)}</td><td>${escapeHtml(paymentStatus)}</td><td><select aria-label="Order status" data-order-status="${escapeHtml(id)}">${options}</select></td><td><button type="button" data-order-detail="${escapeHtml(id)}">Details</button><button type="button" data-order-update="${escapeHtml(id)}">Update</button></td></tr>`;
-    }).join('')}</tbody></table>` : '<p>No orders found.</p>';
+      return `<tr><td><strong class="admin-order-number">${escapeHtml(orderNumber)}</strong></td><td>${escapeHtml(customer)}</td><td class="admin-order-total">${currency(total)}</td><td><span class="admin-status status-${paymentClass}">${escapeHtml(paymentStatus)}</span></td><td><select aria-label="Order status" data-order-status="${escapeHtml(id)}">${options}</select></td><td><div class="admin-table-actions"><button class="admin-secondary-action" type="button" data-order-detail="${escapeHtml(id)}">Details</button><button class="admin-primary-action" type="button" data-order-update="${escapeHtml(id)}">Update</button></div></td></tr>`;
+    }).join('')}</tbody></table></div>` : '<p class="admin-empty-state">No orders match these filters. Try changing your search or status.</p>';
     await loadPendingPayments();
   }
 
   async function loadPendingPayments() {
     const content = ensureOrderPanel();
     const payments = apiList(await window.RecyLightAPI.getPendingPayments(), 'payments');
-    content.querySelector('.admin-pending-payments').innerHTML = payments.length ? `<table><thead><tr><th>Customer</th><th>Order</th><th>Phone</th><th>Reference</th><th>Amount</th><th>Submitted</th><th>Status</th><th></th></tr></thead><tbody>${payments.map(payment => {
+    content.querySelector('.admin-pending-payments').innerHTML = payments.length ? `<div class="admin-table-wrap"><table><thead><tr><th>Customer</th><th>Order</th><th>Phone</th><th>Reference</th><th>Amount</th><th>Submitted</th><th>Status</th><th>Actions</th></tr></thead><tbody>${payments.map(payment => {
       const id = payment.id || payment.paymentId;
       const customer = payment.customerName || payment.customer?.name || payment.order?.customerName || payment.order?.customer?.name || 'Customer';
       const orderNumber = payment.orderNumber || payment.order?.orderNumber || payment.order?.order_number || '';
       const submitted = payment.createdAt || payment.submittedAt;
       const submittedLabel = submitted && !Number.isNaN(Date.parse(submitted)) ? new Date(submitted).toLocaleString() : 'Date unavailable';
-      return `<tr><td>${escapeHtml(customer)}</td><td>${escapeHtml(orderNumber)}</td><td>${escapeHtml(payment.phone || payment.order?.phone || '')}</td><td>${escapeHtml(payment.transactionReference || '')}</td><td>${currency(payment.amount)}</td><td>${escapeHtml(submittedLabel)}</td><td>Pending</td><td><button type="button" data-payment-decision="APPROVE" data-payment-id="${escapeHtml(id)}">Approve</button><button type="button" data-payment-decision="REJECT" data-payment-id="${escapeHtml(id)}">Reject</button></td></tr>`;
-    }).join('')}</tbody></table>` : '<p>No pending manual payments.</p>';
+      return `<tr><td>${escapeHtml(customer)}</td><td>${escapeHtml(orderNumber)}</td><td>${escapeHtml(payment.phone || payment.order?.phone || '')}</td><td><code class="admin-reference">${escapeHtml(payment.transactionReference || '')}</code></td><td class="admin-order-total">${currency(payment.amount)}</td><td>${escapeHtml(submittedLabel)}</td><td><span class="admin-status status-pending">Pending review</span></td><td><div class="admin-table-actions"><button class="admin-primary-action" type="button" data-payment-decision="APPROVE" data-payment-id="${escapeHtml(id)}">Approve</button><button class="admin-danger-action" type="button" data-payment-decision="REJECT" data-payment-id="${escapeHtml(id)}">Reject</button></div></td></tr>`;
+    }).join('')}</tbody></table></div>` : '<p class="admin-empty-state">There are no manual payments waiting for review.</p>';
   }
 
   function showOrderDetail(order) {
@@ -284,8 +286,13 @@
     if (!report) {
       report = document.createElement('section');
       report.className = 'admin-api-report';
-      report.innerHTML = '<h2>Store reports</h2><div class="admin-report-summary"></div><h3>Sales by day</h3><div class="admin-sales-table"></div>';
-      container.insertBefore(report, container.querySelector('.request-list'));
+      report.innerHTML = '<div class="admin-report-heading"><div><span class="eyebrow">BUSINESS PERFORMANCE</span><h2>Store reports</h2><p>A snapshot of order activity and paid revenue from your store.</p></div><span class="admin-report-source">Live API data</span></div><div class="admin-report-summary" aria-label="Store performance summary"></div><section class="admin-sales-section"><div class="admin-section-heading"><div><h3>Sales by day</h3><p>Daily order volume and revenue</p></div></div><div class="admin-sales-table"></div></section>';
+      const requestHeading = container.querySelector('.panel-heading');
+      if (requestHeading) {
+        requestHeading.querySelector('.eyebrow').textContent = 'CUSTOMER ACTIVITY';
+        requestHeading.querySelector('h2').textContent = 'Customer enquiries';
+      }
+      container.insertBefore(report, requestHeading || container.firstElementChild);
     }
     const [summaryResponse, salesResponse] = await Promise.all([
       window.RecyLightAPI.getAdminReports(),
@@ -300,9 +307,14 @@
       ['Paid revenue', summary.paidRevenue],
       ['Products', summary.productCount],
     ].filter(([, value]) => value != null);
-    report.querySelector('.admin-report-summary').innerHTML = metrics.map(([label, value]) => `<p><strong>${escapeHtml(label)}:</strong> ${escapeHtml(typeof value === 'number' && label.includes('revenue') ? currency(value) : value)}</p>`).join('');
+    report.querySelector('.admin-report-summary').innerHTML = metrics.length ? metrics.map(([label, value]) => {
+      const formattedValue = /revenue/i.test(label)
+        ? currency(Number(value))
+        : typeof value === 'number' ? value.toLocaleString('en-US') : value;
+      return `<article class="admin-report-metric${/revenue/i.test(label) ? ' is-revenue' : ''}"><span>${escapeHtml(label)}</span><strong>${escapeHtml(formattedValue)}</strong></article>`;
+    }).join('') : '<p class="admin-empty-state">No summary metrics are available yet.</p>';
     const sales = apiList(salesResponse, 'sales').length ? apiList(salesResponse, 'sales') : apiList(salesResponse, 'days');
-    report.querySelector('.admin-sales-table').innerHTML = sales.length ? `<table><thead><tr><th>Date</th><th>Orders</th><th>Revenue</th></tr></thead><tbody>${sales.map(day => `<tr><td>${escapeHtml(day.date || day.day)}</td><td>${escapeHtml(day.orderCount ?? day.orders ?? 0)}</td><td>${currency(day.revenue || 0)}</td></tr>`).join('')}</tbody></table>` : '<p>No sales data for this period.</p>';
+    report.querySelector('.admin-sales-table').innerHTML = sales.length ? `<div class="admin-table-wrap"><table><thead><tr><th>Date</th><th>Orders</th><th>Revenue</th></tr></thead><tbody>${sales.map(day => `<tr><td>${escapeHtml(day.date || day.day)}</td><td>${escapeHtml(day.orderCount ?? day.orders ?? 0)}</td><td class="admin-order-total">${currency(day.revenue || 0)}</td></tr>`).join('')}</tbody></table></div>` : '<p class="admin-empty-state">Sales data will appear here when orders are recorded.</p>';
   }
 
   function showImage(source) {

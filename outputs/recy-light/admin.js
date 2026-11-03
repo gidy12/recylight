@@ -254,6 +254,42 @@
     }).join('')}</tbody></table></div>` : '<p class="admin-empty-state">There are no manual payments waiting for review.</p>';
   }
 
+  async function loadCustomers() {
+    const body = $('#view-customers .customers-table-body');
+    const empty = $('#customers-empty');
+    try {
+      const orders = apiList(await window.RecyLightAPI.getAdminOrders({ page: 1, limit: 100 }), 'orders');
+      const byCustomer = new Map();
+      for (const order of orders) {
+        const name = order.customerName || order.customer?.name || 'Customer';
+        const email = order.customerEmail || order.customer?.email || '';
+        const phone = order.customerPhone || order.customer?.phone || '';
+        const total = Number(order.totalAmount ?? order.total ?? order.subtotal ?? 0);
+        const createdAt = order.createdAt || order.orderDate || order.date;
+        const existing = byCustomer.get(email || name);
+        if (existing) {
+          existing.orderCount += 1;
+          existing.totalSpent += total;
+          if (!createdAt || !existing.lastOrder || new Date(createdAt) > new Date(existing.lastOrder)) {
+            existing.lastOrder = createdAt;
+          }
+        } else {
+          byCustomer.set(email || name, { name, email, phone, orderCount: 1, totalSpent: total, lastOrder: createdAt });
+        }
+      }
+      const customers = Array.from(byCustomer.values()).sort((a, b) => b.totalSpent - a.totalSpent);
+      body.innerHTML = customers.length ? customers.map(c => {
+        const lastLabel = c.lastOrder && !Number.isNaN(Date.parse(c.lastOrder)) ? new Date(c.lastOrder).toLocaleDateString() : '—';
+        return `<tr><td><strong>${escapeHtml(c.name)}</strong>${c.phone ? `<br><span class="admin-reference">${escapeHtml(c.phone)}</span>` : ''}</td><td>${escapeHtml(c.email) || '—'}</td><td>${c.orderCount}</td><td class="admin-order-total">${currency(c.totalSpent)}</td><td>${lastLabel}</td></tr>`;
+      }).join('') : '<tr><td colspan="5" class="admin-empty-state">No customers found.</td></tr>';
+      empty.hidden = customers.length > 0;
+    } catch (error) {
+      body.innerHTML = '<tr><td colspan="5" class="admin-empty-state">Could not load customers.</td></tr>';
+      empty.hidden = true;
+      notify(error.message || 'Could not load customers.');
+    }
+  }
+
   function showOrderDetail(order) {
     let dialog = $('#admin-order-detail');
     if (!dialog) {
@@ -477,6 +513,7 @@
     products: ['Products & stock', 'Add products, update prices, and manage stock.'],
     orders: ['Orders', 'Review and manage customer orders.'],
     quotes: ['Report', 'Review customer enquiries and activity.'],
+    customers: ['Customers', 'View customers who have created accounts.'],
     settings: ['Store settings', 'Manage your store profile and contact details.']
   };
   function selectView(name) {
@@ -494,6 +531,7 @@
     $('#admin-page-description').textContent = viewDetails[name][1];
     if (name === 'orders') loadOrders().catch(error => notify(error.message || 'Could not load orders.'));
     if (name === 'quotes') loadReports().catch(error => notify(error.message || 'Could not load reports.'));
+    if (name === 'customers') loadCustomers().catch(error => notify(error.message || 'Could not load customers.'));
   }
   document.querySelectorAll('[data-admin-view]').forEach(button => {
     button.addEventListener('click', () => selectView(button.dataset.adminView));

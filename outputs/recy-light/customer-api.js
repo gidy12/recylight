@@ -4,8 +4,19 @@
   const accountForm = $('#account-form');
   const accountFields = $('.account-fields');
   const paymentOptions = $('#checkout-form select[name="payment"]')?.options;
-  if (paymentOptions?.[1]) paymentOptions[1].value = 'MTN_MOMO_MANUAL';
-  if (paymentOptions?.[2]) paymentOptions[2].value = 'CASH_ON_DELIVERY';
+  if (paymentOptions?.[1]) {
+    paymentOptions[1].value = 'MTN_MOMO_MANUAL';
+    paymentOptions[1].textContent = 'MTN Mobile Money';
+  }
+  if (paymentOptions?.[2]) {
+    paymentOptions[2].value = 'CASH_ON_DELIVERY';
+    paymentOptions[2].textContent = 'Cash on delivery';
+  }
+  const paymentSelect = $('#checkout-form select[name="payment"]');
+  if (paymentSelect) paymentSelect.required = true;
+  $('#checkout-dialog h2').textContent = 'Checkout';
+  $('.checkout-disclaimer').textContent = 'Enter your delivery details and choose how you would like to pay. Your order is submitted securely to RecyLight.';
+  $('#checkout-form button[type="submit"]').innerHTML = 'Place order <span>→</span>';
 
   function appendField(id, labelText, attributes = {}) {
     const label = document.createElement('label');
@@ -250,6 +261,8 @@
     }
   });
 
+  let checkoutPayloadSignature = '';
+  let checkoutIdempotencyKey = '';
   const checkoutForm = $('#checkout-form');
   checkoutForm.addEventListener('submit', async event => {
     event.preventDefault();
@@ -258,66 +271,73 @@
     if (!api) return;
 
     const feedback = $('#form-feedback');
+    if (!api) {
+      feedback.textContent = 'The RecyLight API is unavailable. No order was submitted.';
+      return;
+    }
     const submit = checkoutForm.querySelector('button[type="submit"]');
     const formData = new FormData(checkoutForm);
     const phone = String(formData.get('phone') || '').trim();
-    const paymentMethod = formData.get('payment') || 'CASH_ON_DELIVERY';
+    const paymentMethod = formData.get('payment');
     submit.disabled = true;
     feedback.textContent = '';
     checkoutForm.querySelector('.checkout-whatsapp-fallback')?.remove();
 
     try {
       if (!window.RECYLIGHT_API_CATALOG_LOADED) {
-        feedback.textContent = 'The live catalog is empty, so no order or payment was submitted. The products shown are examples; contact RecyLight to confirm current stock and prices.';
-        const whatsappButton = document.createElement('button');
-        whatsappButton.type = 'button';
-        whatsappButton.className = 'button button-green checkout-whatsapp-fallback';
-        const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        icon.setAttribute('viewBox', '0 0 24 24');
-        icon.setAttribute('width', '18');
-        icon.setAttribute('height', '18');
-        icon.setAttribute('aria-hidden', 'true');
-        icon.setAttribute('focusable', 'false');
-        icon.setAttribute('fill', 'none');
-        icon.setAttribute('stroke', 'currentColor');
-        icon.setAttribute('stroke-width', '1.8');
-        icon.setAttribute('stroke-linecap', 'round');
-        icon.setAttribute('stroke-linejoin', 'round');
-        const bubble = document.createElementNS(icon.namespaceURI, 'path');
-        bubble.setAttribute('d', 'M20.2 11.6a8.6 8.6 0 0 1-12.5 7.6L3 20l.9-4.8a8.6 8.6 0 1 1 16.3-3.6Z');
-        const handset = document.createElementNS(icon.namespaceURI, 'path');
-        handset.setAttribute('d', 'M9.1 8.3c.3-.6.7-.5 1-.2l1.2 1.8c.2.3.2.6-.1.9l-.7.7c.5 1 1.3 1.8 2.3 2.3l.7-.7c.3-.3.6-.3.9-.1l1.8 1.2c.3.2.4.7.2 1-.5.8-1.3 1.3-2.2 1.2-3.4-.5-6.1-3.2-6.6-6.6-.1-.6.1-1.1.5-1.5Z');
-        icon.append(bubble, handset);
-        const label = document.createElement('span');
-        label.textContent = 'Send cart enquiry via WhatsApp';
-        whatsappButton.append(icon, label);
-        whatsappButton.addEventListener('click', () => window.sendWhatsAppOrder?.());
-        feedback.after(whatsappButton);
+        feedback.textContent = 'The live product catalogue is unavailable. No order was submitted. Please retry after the catalogue connection is restored.';
         return;
       }
       const items = cartLines().map(({ p, qty }) => ({ productId: p.id, quantity: qty }));
       if (!items.length) throw new Error('Your cart is empty.');
-      const idempotencyKey = crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
-      const response = await api.createOrder({
-        customerName: String(formData.get('name') || '').trim(),
+      const customerName = String(formData.get('name') || '').trim();
+      const orderPayload = {
+        customerName,
         phone,
         email: String(formData.get('email') || '').trim() || undefined,
         deliveryLocation: String(formData.get('address') || '').trim(),
         notes: String(formData.get('instructions') || '').trim() || undefined,
         paymentMethod,
         items,
-      }, idempotencyKey);
+      };
+      const payloadSignature = JSON.stringify(orderPayload);
+      if (payloadSignature !== checkoutPayloadSignature) {
+        checkoutPayloadSignature = payloadSignature;
+        checkoutIdempotencyKey = crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      }
+      const response = await api.createOrder(orderPayload, checkoutIdempotencyKey);
       const order = unwrap(response);
-      const orderNumber = order?.orderNumber || order?.order_number || order?.order?.orderNumber || order?.order?.order_number;
+      const savedOrder = order?.order || order;
+      const orderNumber = savedOrder?.orderNumber || savedOrder?.order_number || savedOrder?.id || order?.orderNumber || order?.order_number || order?.id;
       if (!orderNumber) throw new Error('Order was created but the API did not return an order number.');
-      const savedOrder = order.order || order;
-      const amountDue = Number(savedOrder.totalAmount ?? savedOrder.total ?? savedOrder.subtotal ?? cartTotal());
-      feedback.textContent = paymentMethod === 'MTN_MOMO_MANUAL'
-        ? `Order ${orderNumber} created. Amount to pay: RWF ${amountDue.toLocaleString('en-US')}.`
-        : `Order ${orderNumber} created. The team will confirm availability and delivery.`;
-      if (paymentMethod === 'MTN_MOMO_MANUAL') addPaymentReferenceForm(orderNumber, phone, amountDue, feedback);
+      checkoutPayloadSignature = '';
+      checkoutIdempotencyKey = '';
       cartLines().forEach(({ p }) => { delete cart[p.id]; });
       updateCart();
+      if (paymentMethod === 'MTN_MOMO_MANUAL') {
+        const amountDue = Number(savedOrder.totalAmount ?? savedOrder.total ?? savedOrder.subtotal);
+        if (!Number.isFinite(amountDue) || amountDue < 0) {
+          feedback.textContent = `Order #${orderNumber} was created, but the API did not return its total. Contact RecyLight before paying; do not submit the order again.`;
+          return;
+        }
+        const paymentOrder = {
+          orderNumber: String(orderNumber),
+          customerName: savedOrder.customerName || savedOrder.customer?.name || customerName,
+          phone,
+          totalAmount: amountDue,
+          paymentMethod: 'MTN_MOMO_MANUAL',
+          paymentStatus: savedOrder.paymentStatus || savedOrder.latestPayment?.status || 'PENDING',
+          createdAt: savedOrder.createdAt || savedOrder.created_at || null,
+        };
+        try {
+          sessionStorage.setItem('recy-light-payment-order', JSON.stringify(paymentOrder));
+          window.location.assign(`payment.html?order=${encodeURIComponent(orderNumber)}`);
+        } catch {
+          feedback.textContent = `Order #${orderNumber} was created, but payment instructions could not be opened. Do not submit the order again; contact RecyLight with this order number.`;
+        }
+        return;
+      }
+      feedback.textContent = `Order #${orderNumber} created. The team will confirm availability and delivery.`;
     } catch (error) {
       const validationErrors = error.data?.errors?.map(item => item.message).filter(Boolean);
       feedback.textContent = validationErrors?.length ? validationErrors.join(' ') : error.message || 'Could not submit the order.';
@@ -326,43 +346,4 @@
     }
   }, true);
 
-  function addPaymentReferenceForm(orderNumber, phone, amountDue, feedback) {
-    document.querySelector('#manual-payment-reference')?.remove();
-    const section = document.createElement('section');
-    section.id = 'manual-payment-reference';
-    const instruction = document.createElement('p');
-    instruction.textContent = `Order #${orderNumber} · Amount due: RWF ${amountDue.toLocaleString('en-US')}. On your phone, use the MTN MoMo merchant code *182*8*1*011115# to pay this exact amount. After payment, enter the transaction ID below. Your order remains unconfirmed until RecyLight verifies the payment.`;
-    const label = document.createElement('label');
-    label.textContent = 'MTN transaction reference';
-    const input = document.createElement('input');
-    input.required = true;
-    input.minLength = 4;
-    input.maxLength = 120;
-    input.autocomplete = 'off';
-    label.append(input);
-    const button = document.createElement('button');
-    button.className = 'button button-green';
-    button.type = 'button';
-    button.textContent = 'Submit payment reference';
-    button.addEventListener('click', async () => {
-      if (!input.reportValidity()) return;
-      button.disabled = true;
-      try {
-        const result = unwrap(await api.createManualPayment({
-          orderNumber,
-          phone,
-          transactionReference: input.value.trim(),
-        }));
-        const orderStatus = result.status === 'PENDING_REVIEW' ? 'PENDING' : result.status || 'PENDING';
-        feedback.textContent = `Your payment confirmation has been submitted successfully. Our team will verify your payment. You will receive an email notification once your payment has been confirmed. Please wait for verification before considering your order confirmed.\nOrder number: #${orderNumber}\nPayment status: ${orderStatus}.`;
-        section.remove();
-      } catch (error) {
-        feedback.textContent = error.message || 'Could not submit the payment reference.';
-      } finally {
-        button.disabled = false;
-      }
-    });
-    section.append(instruction, label, button);
-    $('#checkout-form').append(section);
-  }
 })();

@@ -29,15 +29,28 @@
   const t = text => {
     let language = 'en';
     try { language = localStorage.getItem('recylight-language') || 'en'; } catch {}
+    const liveAnswers = {
+      'Prices and stock shown are for preview and should be confirmed by the team.': {
+        en: 'Prices and stock shown come from the live catalog and may change before checkout.',
+        rw: 'Ibiciro n’ibiri mu bubiko biva muri katalogi nyayo kandi bishobora guhinduka mbere yo kwishyura.',
+        sw: 'Bei na bidhaa zilizopo zinaonyeshwa kutoka kwenye katalogi halisi na zinaweza kubadilika kabla ya kulipa.'
+      },
+      'Payment options are not set up for online payment yet. The team will confirm how to pay when they reply to your enquiry.': {
+        en: 'Choose MTN Mobile Money at checkout. Payments are manually verified before an order is confirmed.',
+        rw: 'Hitamo MTN Mobile Money mu gihe cyo kwishyura. Ikipe igenzura intoki ubwishyu mbere yo kwemeza itumiza.',
+        sw: 'Chagua MTN Mobile Money unapolipa. Malipo yanathibitishwa na msimamizi kabla ya oda kuthibitishwa.'
+      },
+      'This site is a catalog preview and cannot confirm or track a real order yet. Send an enquiry and the team can help with the next steps.': {
+        en: 'You can place an order from the catalog and check its payment status using your order number and checkout phone.',
+        rw: 'Ushobora gutumiza mu katalogi no kureba uko ubwishyu buhagaze ukoresheje nimero y’itumiza na telefone wakoresheje.',
+        sw: 'Unaweza kuagiza kupitia katalogi na kuangalia hali ya malipo kwa kutumia nambari ya oda na simu uliyotumia.'
+      }
+    };
+    if (liveAnswers[text]) return liveAnswers[text][language] || liveAnswers[text].en;
     return chatCopy[language]?.[text] || faqCopy[language]?.[text] || (window.translateStoreText ? window.translateStoreText(text) : text);
   };
   const safe = value => String(value ?? '').replace(/[&<>"']/g, character => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[character]);
-  const catalog = () => {
-    try {
-      const saved = JSON.parse(localStorage.getItem('recylight-products') || 'null');
-      return Array.isArray(saved) ? saved : (window.RECYLIGHT_DEFAULT_PRODUCTS || []);
-    } catch { return window.RECYLIGHT_DEFAULT_PRODUCTS || []; }
-  };
+  const catalog = () => window.RecyLightCatalog?.getProducts() || [];
 
   document.querySelectorAll('[data-chat-t]').forEach(node => { node.textContent = t(node.dataset.chatT); });
   input.placeholder = t(input.dataset.chatPlaceholder);

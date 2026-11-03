@@ -13,6 +13,8 @@
   let currentImage = '';
   let pendingImageFile = null;
   let toastTimer;
+  $('#product-was').closest('label').childNodes[0].textContent = 'Discounted price ';
+  $('.overview-note p').textContent = 'Product changes are saved through the RecyLight API. Publish a product to make it available in the customer catalogue.';
 
   function apiData(response) { return response?.data ?? response; }
 
@@ -149,7 +151,10 @@
       return `<article class="catalog-item">${image}<div><h3>${escapeHtml(item.name)}</h3><div class="catalog-meta"><strong>${currency(item.price)}</strong><span>${escapeHtml(item.category)}</span>${item.brand ? `<span>${escapeHtml(item.brand)}</span>` : ''}<span>${Number(item.stock) || 0} in stock</span></div></div><div class="catalog-actions"><button type="button" data-edit="${escapeHtml(item.id)}">Edit</button><button class="delete-product" type="button" data-delete="${escapeHtml(item.id)}">Delete</button></div></article>`;
     }).join('');
     $('#catalog-list').querySelectorAll('[data-edit]').forEach(button => button.addEventListener('click', () => editProduct(button.dataset.edit)));
-    $('#catalog-list').querySelectorAll('[data-delete]').forEach(button => button.addEventListener('click', () => deleteProduct(button.dataset.delete)));
+    $('#catalog-list').querySelectorAll('[data-delete]').forEach(button => {
+      button.textContent = 'Archive';
+      button.addEventListener('click', () => deleteProduct(button.dataset.delete));
+    });
   }
 
   const orderStatuses = ['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'COMPLETED', 'CANCELLED'];
@@ -197,8 +202,12 @@
           try {
             await window.RecyLightAPI.verifyPayment(paymentId, decision, reason?.trim());
             notify(decision === 'APPROVE' ? 'Payment approved.' : 'Payment rejected.');
-            await loadPendingPayments();
-            await loadDashboard();
+            try {
+              await loadOrders();
+              await loadDashboard();
+            } catch (error) {
+              notify(`Payment decision was saved, but admin data could not be refreshed: ${error.message}`);
+            }
           } finally {
             if (verifyButton.isConnected) verifyButton.disabled = false;
           }
@@ -342,9 +351,9 @@
 
   async function deleteProduct(id) {
     const item = products.find(product => product.id === id);
-    if (!item || !confirm(`Remove “${item.name}” from the catalog?`)) return;
+    if (!item || !confirm(`Archive “${item.name}” from the catalog?`)) return;
     try {
-      await window.RecyLightAPI.deleteAdminProduct(id);
+      await window.RecyLightAPI.patchAdminProduct(id, { status: 'ARCHIVED' });
       if ($('#product-id').value === id) resetForm();
       await loadProducts();
       render();
@@ -422,12 +431,15 @@
         throw new Error('This image is not hosted yet. Select the photo again to upload it.');
       }
       const discountPrice = Number($('#product-was').value);
+      if (discountPrice > 0 && discountPrice >= Number($('#product-price').value)) {
+        throw new Error('The discounted price must be lower than the regular price.');
+      }
       const payload = {
         name,
         categoryId: $('#product-category').value || null,
         brand: $('#product-brand').value.trim(),
         price: Number($('#product-price').value),
-        ...(discountPrice > 0 ? { discountPrice } : {}),
+        discountPrice: discountPrice > 0 ? discountPrice : null,
         stockQuantity: Number($('#product-stock').value),
         status: $('#product-status').value,
         isFeatured: Boolean($('#product-badge').value.trim()),

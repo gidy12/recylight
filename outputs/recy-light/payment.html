@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#142131">
+  <title>Complete Your Payment — RecyLight Ltd</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="payment.css">
+</head>
+<body class="payment-page">
+  <main class="payment-shell">
+    <a class="payment-brand" href="index.html">Recy<span>Light</span> Ltd</a>
+    <section class="payment-card" aria-labelledby="payment-title">
+      <span class="eyebrow">ORDER PAYMENT</span>
+      <h1 id="payment-title">Complete Your Payment</h1>
+      <p class="payment-intro">Pay RecyLight Ltd using MTN Mobile Money. Your order will remain awaiting verification until our team confirms the transaction.</p>
+
+      <section class="merchant-panel" aria-label="Merchant payment details">
+        <p>Business name <strong>RecyLight Ltd</strong></p>
+        <p>MTN Mobile Money merchant code</p>
+        <div class="merchant-code-row"><strong id="merchant-code">*182*8*1*011115#</strong><button type="button" id="copy-merchant-code">Copy code</button></div>
+        <p>Payment amount <strong id="payment-amount">Loading…</strong></p>
+        <p id="copy-feedback" class="payment-feedback" role="status"></p>
+      </section>
+
+      <section class="payment-steps">
+        <h2>Payment steps</h2>
+        <ol>
+          <li>Open the MTN Mobile Money menu on your phone.</li>
+          <li>Dial the merchant payment code displayed on this page.</li>
+          <li>Follow the instructions on your phone.</li>
+          <li>Enter the exact order amount displayed on this page.</li>
+          <li>Confirm the payment using your MTN Mobile Money account.</li>
+          <li>Keep your payment confirmation message for reference.</li>
+        </ol>
+      </section>
+
+      <section class="order-summary" aria-labelledby="order-summary-title">
+        <h2 id="order-summary-title">Order information</h2>
+        <dl>
+          <div><dt>Order number</dt><dd id="order-number">Loading…</dd></div>
+          <div><dt>Customer name</dt><dd id="customer-name">Loading…</dd></div>
+          <div><dt>Order total</dt><dd id="order-total">Loading…</dd></div>
+          <div><dt>Payment method</dt><dd>MTN Mobile Money</dd></div>
+          <div><dt>Payment status</dt><dd id="payment-status">Awaiting payment confirmation</dd></div>
+          <div><dt>Date and time</dt><dd id="order-date">Loading…</dd></div>
+        </dl>
+        <button type="button" class="refresh-status" id="refresh-payment-status">Refresh payment status</button>
+        <p id="status-feedback" class="payment-feedback" role="status"></p>
+      </section>
+
+      <form class="reference-form" id="payment-reference-form">
+        <h2>Submit your payment reference</h2>
+        <p>After paying, enter the transaction reference from your MTN confirmation message. An administrator will verify it.</p>
+        <label for="transaction-reference">MTN transaction reference</label>
+        <input id="transaction-reference" name="transactionReference" required minlength="4" maxlength="120" autocomplete="off">
+        <button type="submit" id="submit-payment-reference">Submit for verification</button>
+        <p id="reference-feedback" class="payment-feedback" role="status"></p>
+      </form>
+
+      <p class="payment-notice">After completing your payment, please wait while RecyLight Ltd verifies your transaction. You will receive an email confirmation once your payment has been verified.</p>
+      <a class="back-to-store" href="index.html">Return to the storefront</a>
+    </section>
+  </main>
+  <script src="api.js?v=12"></script>
+  <script src="payment.js?v=1"></script>
+</body>
+</html>

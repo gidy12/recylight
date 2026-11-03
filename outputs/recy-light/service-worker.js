@@ -1,12 +1,13 @@
 const CACHE_PREFIX = 'recylight-shell-';
-const CACHE_NAME = `${CACHE_PREFIX}19`;
+const CACHE_NAME = `${CACHE_PREFIX}20`;
 const SHELL = [
   './', './index.html', './offline.html', './manifest.webmanifest',
   './styles.css', './hero.css', './hero-fill.css', './hero-banner.css',
   './product-cards.css', './navbar.css', './dark-mode.css', './button-colors.css',
+  './catalog.css',
   './language.css', './responsive.css', './phone-fit.css', './nav-actions.css',
   './account-dialog.css', './customer-chat.css', './product-detail.css', './pwa.css',
-  './products-data.js', './api.js', './customer-api.js', './app.js', './account-auth.js', './hero-carousel.js', './navbar.js',
+  './api.js', './customer-api.js', './app.js', './catalog-api.js', './account-auth.js', './hero-carousel.js', './navbar.js',
   './theme.js', './language.js', './customer-chat.js', './pwa.js',
   './assets/hero-bulbs.jpg', './assets/hero-light-helper.jpg', './assets/hero-light-hands.jpg',
   './assets/icon-180.png', './assets/icon-192.png', './assets/icon-512.png'
@@ -29,7 +30,7 @@ self.addEventListener('message', event => {
 });
 
 function isPrivatePath(pathname) {
-  return /\/(?:admin(?:\.html|\.js|\.css|-login\.js|-login\.css)?|login\.html)(?:$|\/)/i.test(pathname)
+  return /\/(?:admin(?:\.html|\.js|\.css|-login\.js|-login\.css)?|login\.html|payment\.html|payment\.js)(?:$|\/)/i.test(pathname)
     || /\/api(?:\/|$)/i.test(pathname);
 }
 

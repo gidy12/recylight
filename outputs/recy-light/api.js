@@ -115,6 +115,9 @@
   async function getOrder(orderNumber, phone) {
     return request(`/api/v1/orders/${encodeURIComponent(orderNumber)}${queryString({ phone })}`);
   }
+  async function deleteAdminOrder(id) {
+    return request(`/api/v1/admin/orders/${encodeURIComponent(id)}`, { method: 'DELETE' });
+  }
 
   // ── Manual MTN MoMo payments ──────────────────────────────────
   async function createManualPayment(data) { return request('/api/v1/payments/manual', { method: 'POST', body: data }); }
@@ -193,6 +196,9 @@
   async function patchAdminOrderStatus(id, status) {
     return request(`/api/v1/admin/orders/${encodeURIComponent(id)}/status`, { method: 'PATCH', body: { status } });
   }
+  async function deleteAdminOrder(id) {
+    return request(`/api/v1/admin/orders/${encodeURIComponent(id)}`, { method: 'DELETE' });
+  }
 
   // ── Admin reports ─────────────────────────────────────────────
   async function getAdminReports(params = {}) { return request(`/api/v1/admin/reports${queryString(params)}`); }
@@ -207,7 +213,7 @@
     getAdminDashboard,
     getAdminProducts, createAdminProduct, patchAdminProduct, deleteAdminProduct, uploadAdminImage,
     getAdminCategories, createAdminCategory, patchAdminCategory, deleteAdminCategory,
-    getAdminOrders, getAdminOrder, patchAdminOrderStatus,
+    getAdminOrders, getAdminOrder, patchAdminOrderStatus, deleteAdminOrder,
     getAdminReports, getAdminSalesReports,
   };
 })();

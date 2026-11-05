@@ -177,6 +177,7 @@
     content.addEventListener('click', async event => {
       const detailButton = event.target.closest('[data-order-detail]');
       const updateButton = event.target.closest('[data-order-update]');
+      const deleteButton = event.target.closest('[data-order-delete]');
       const verifyButton = event.target.closest('[data-payment-decision]');
       try {
         if (detailButton) {
@@ -188,6 +189,18 @@
           notify('Order status updated.');
           await loadOrders();
           await loadDashboard();
+        } else if (deleteButton) {
+          const id = deleteButton.dataset.orderDelete;
+          if (!confirm(`Delete order ${id}?`)) return;
+          deleteButton.disabled = true;
+          try {
+            await window.RecyLightAPI.deleteAdminOrder(id);
+            notify('Order deleted.');
+            await loadOrders();
+            await loadDashboard();
+          } finally {
+            if (deleteButton.isConnected) deleteButton.disabled = false;
+          }
         } else if (verifyButton) {
           const decision = verifyButton.dataset.paymentDecision;
           const paymentId = verifyButton.dataset.paymentId;
@@ -236,7 +249,7 @@
       const paymentStatus = order.paymentStatus || order.latestPayment?.status || 'UNPAID';
       const paymentClass = String(paymentStatus).toLowerCase().replace(/[^a-z0-9-]/g, '');
       const options = orderStatuses.map(status => `<option value="${status}"${status === order.status ? ' selected' : ''}>${status}</option>`).join('');
-      return `<tr><td><strong class="admin-order-number">${escapeHtml(orderNumber)}</strong></td><td>${escapeHtml(customer)}</td><td class="admin-order-total">${currency(total)}</td><td><span class="admin-status status-${paymentClass}">${escapeHtml(paymentStatus)}</span></td><td><select aria-label="Order status" data-order-status="${escapeHtml(id)}">${options}</select></td><td><div class="admin-table-actions"><button class="admin-secondary-action" type="button" data-order-detail="${escapeHtml(id)}">Details</button><button class="admin-primary-action" type="button" data-order-update="${escapeHtml(id)}">Update</button></div></td></tr>`;
+      return `<tr><td><strong class="admin-order-number">${escapeHtml(orderNumber)}</strong></td><td>${escapeHtml(customer)}</td><td class="admin-order-total">${currency(total)}</td><td><span class="admin-status status-${paymentClass}">${escapeHtml(paymentStatus)}</span></td><td><select aria-label="Order status" data-order-status="${escapeHtml(id)}">${options}</select></td><td><div class="admin-table-actions"><button class="admin-secondary-action" type="button" data-order-detail="${escapeHtml(id)}">Details</button><button class="admin-primary-action" type="button" data-order-update="${escapeHtml(id)}">Update</button><button class="admin-danger-action" type="button" data-order-delete="${escapeHtml(id)}">Delete</button></div></td></tr>`;
     }).join('')}</tbody></table></div>` : '<p class="admin-empty-state">No orders match these filters. Try changing your search or status.</p>';
     await loadPendingPayments();
   }

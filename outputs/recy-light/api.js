@@ -7,8 +7,6 @@
   const isLocal = ['localhost', '127.0.0.1'].includes(window.location.hostname);
   const defaultBaseUrl = isLocal ? 'https://recylight-api.onrender.com' : '';
   const BASE_URL = (window.RECYLIGHT_API_BASE_URL ?? defaultBaseUrl).replace(/\/$/, '');
-  const ADMIN_IMAGE_UPLOAD_PATH = window.RECYLIGHT_ADMIN_IMAGE_UPLOAD_PATH || '/api/v1/admin/uploads';
-
   const emit = (name, detail) => window.dispatchEvent(new CustomEvent(name, { detail }));
   const queryString = params => {
     const query = new URLSearchParams(Object.entries(params || {}).filter(([, value]) => value !== undefined && value !== null && value !== ''));
@@ -139,50 +137,6 @@
   async function createAdminProduct(data) { return request('/api/v1/admin/products', { method: 'POST', body: data }); }
   async function patchAdminProduct(id, data) { return request(`/api/v1/admin/products/${encodeURIComponent(id)}`, { method: 'PATCH', body: data }); }
   async function deleteAdminProduct(id) { return request(`/api/v1/admin/products/${encodeURIComponent(id)}`, { method: 'DELETE' }); }
-  async function uploadAdminImage(file) {
-    const url = `${BASE_URL}${ADMIN_IMAGE_UPLOAD_PATH}`;
-    const formData = new FormData();
-    formData.append('file', file, file.name || 'product-image.jpg');
-
-    try {
-      const response = await fetch(url, {
-        method: 'POST',
-        credentials: 'include',
-        headers: { Accept: 'application/json' },
-        body: formData,
-      });
-      let data;
-      try { data = await response.json(); } catch { data = {}; }
-      if (!response.ok) {
-        const error = new Error(data.message || `Image upload failed (${response.status})`);
-        error.status = response.status;
-        error.data = data;
-        throw error;
-      }
-
-      const result = data?.data ?? data;
-      const imageUrl = typeof result === 'string'
-        ? result
-        : result?.url || result?.imageUrl || result?.image_url || result?.image?.url || result?.images?.[0]?.url;
-      if (typeof imageUrl !== 'string' || !/^https?:\/\//i.test(imageUrl)) {
-        throw new Error('The image upload response did not include a hosted image URL.');
-      }
-      return imageUrl;
-    } catch (error) {
-      if (error.name === 'TypeError') {
-        emit('recy:api-error', {
-          message: 'Network/CORS error while uploading the product image. Check the API connection and try again.',
-          path: ADMIN_IMAGE_UPLOAD_PATH,
-        });
-      }
-      console.error(`[RecyLightAPI] ✕ POST ${url} | Status: ${error.status ?? 'N/A'}`, {
-        name: error.name,
-        message: error.message,
-        data: error.data ?? null,
-      });
-      throw error;
-    }
-  }
 
   // ── Admin categories ──────────────────────────────────────────
   async function getAdminCategories() { return request('/api/v1/admin/categories'); }
@@ -211,7 +165,7 @@
     createOrder, getMyOrders, getOrder,
     createManualPayment, getPaymentStatus, getPendingPayments, verifyPayment,
     getAdminDashboard,
-    getAdminProducts, createAdminProduct, patchAdminProduct, deleteAdminProduct, uploadAdminImage,
+    getAdminProducts, createAdminProduct, patchAdminProduct, deleteAdminProduct,
     getAdminCategories, createAdminCategory, patchAdminCategory, deleteAdminCategory,
     getAdminOrders, getAdminOrder, patchAdminOrderStatus, deleteAdminOrder,
     getAdminReports, getAdminSalesReports,

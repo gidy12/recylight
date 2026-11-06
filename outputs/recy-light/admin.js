@@ -484,17 +484,11 @@
     const submit = $('#save-product');
     submit.disabled = true;
     try {
-      if (pendingImageFile) {
-        currentImage = await window.RecyLightAPI.uploadAdminImage(pendingImageFile);
-        pendingImageFile = null;
-      }
-      if (currentImage.startsWith('data:')) {
-        throw new Error('This image is not hosted yet. Select the photo again to upload it.');
-      }
       const discountPrice = Number($('#product-was').value);
       if (discountPrice > 0 && discountPrice >= Number($('#product-price').value)) {
         throw new Error('The discounted price must be lower than the regular price.');
       }
+      const imageValue = currentImage || $('#product-image-url').value.trim() || '';
       const payload = {
         name,
         categoryId: $('#product-category').value || null,
@@ -505,7 +499,7 @@
         status: $('#product-status').value,
         isFeatured: Boolean($('#product-badge').value.trim()),
         description: $('#product-description').value.trim(),
-        images: currentImage ? [currentImage] : [],
+        images: imageValue ? [imageValue] : [],
       };
       if (oldId) await window.RecyLightAPI.patchAdminProduct(oldId, payload);
       else await window.RecyLightAPI.createAdminProduct(payload);

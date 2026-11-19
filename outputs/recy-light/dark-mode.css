@@ -1,0 +1,60 @@
+body.dark-mode {
+  --paper: #101820;
+  --ink: #e5ece9;
+  --muted: #a8b3ae;
+  --line: #303c43;
+  background: var(--paper);
+  color: var(--ink);
+  color-scheme: dark;
+}
+body.dark-mode .site-header {
+  background: #111b24;
+  border-color: #26343b;
+}
+body.dark-mode .main-nav {
+  border-color: #2a373f;
+}
+body.dark-mode .main-nav a,
+body.dark-mode .main-nav button {
+  color: #d3dcd8;
+}
+body.dark-mode .main-nav a:hover,
+body.dark-mode .main-nav button:hover {
+  color: var(--green);
+}
+body.dark-mode .cart-button {
+  border-color: #48554f;
+  color: #e4ece8;
+}
+body.dark-mode .cart-button svg {
+  fill: #e4ece8;
+}
+body.dark-mode .cart-count {
+  background: #9fb346;
+}
+body.dark-mode .product-card {
+  background: #1e293b;
+  border-color: #334155;
+  color: var(--ink);
+}
+body.dark-mode .product-card .product-title,
+body.dark-mode .product-card .product-price {
+  color: var(--ink);
+}
+body.dark-mode .product-card .product-category {
+  color: #a9b5ad;
+}
+body.dark-mode .checkout-dialog-content {
+  background: #1e293b;
+  color: var(--ink);
+}
+body.dark-mode .checkout-fields input,
+body.dark-mode .checkout-fields select,
+body.dark-mode .checkout-fields textarea {
+  background: #1b2830;
+  border-color: #46535a;
+  color: var(--ink);
+}
+body.dark-mode .admin-page {
+  background: #0f172a;
+}

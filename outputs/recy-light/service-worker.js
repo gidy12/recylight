@@ -1,5 +1,5 @@
 const CACHE_PREFIX = 'recylight-shell-';
-const CACHE_NAME = `${CACHE_PREFIX}20`;
+const CACHE_NAME = `${CACHE_PREFIX}21`;
 const SHELL = [
   './', './index.html', './offline.html', './manifest.webmanifest',
   './styles.css', './hero.css', './hero-fill.css', './hero-banner.css',
@@ -10,7 +10,8 @@ const SHELL = [
   './api.js', './customer-api.js', './app.js', './catalog-api.js', './account-auth.js', './hero-carousel.js', './navbar.js',
   './theme.js', './language.js', './customer-chat.js', './pwa.js',
   './assets/hero-bulbs.jpg', './assets/hero-light-helper.jpg', './assets/hero-light-hands.jpg',
-  './assets/icon-180.png', './assets/icon-192.png', './assets/icon-512.png'
+  './assets/icon-180.png', './assets/icon-192.png', './assets/icon-512.png',
+  './assets/icon-512-maskable.png', './assets/recy-light-logo.png'
 ];
 
 self.addEventListener('install', event => {

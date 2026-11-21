@@ -5,6 +5,10 @@
 @media(max-width:880px){.header-tools>.create-account{display:inline-flex;align-items:center;justify-content:center;margin-left:0;padding:8px 9px;font-size:10px}.header-tools>.account-button{display:none}}
 @media(min-width:1500px){.product-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:28px}.product-card{padding:16px 17px 18px}.product-card .product-image{border-radius:20px}.product-card .product-details{padding-top:19px}}
 
+/* Keep the branded logo and wordmark inside the compact mobile header. */
+@media(max-width:880px){.header-top .brand{gap:5px;font-size:16px;letter-spacing:-.6px}.brand-logo{width:32px;height:32px}.brand small{display:none}}
+@media(max-width:400px){.header-top .brand{gap:4px;font-size:14px}.brand-logo{width:26px;height:26px}}
+
 /* Keep the mobile header controls on a single compact row. */
 @media(max-width:880px){
   .site-header{padding:0 12px}
